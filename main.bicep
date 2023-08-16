@@ -185,7 +185,7 @@ resource functionssubnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' 
   name: 'functions'
   parent: observabilityVnet
   properties: {
-    addressPrefix: '10.0.10.0/24'
+    addressPrefix: cidrSubnet(virtualNetwork.addressPrefixes[0], 24, 5)
     delegations: [
       {
         name: 'Microsoft.Web.serverFarms'
