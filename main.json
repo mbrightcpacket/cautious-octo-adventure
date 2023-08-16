@@ -1,0 +1,813 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.20.4.51522",
+      "templateHash": "15389068930250982993"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "deploymentId": {
+      "type": "string"
+    },
+    "adminUser": {
+      "type": "string"
+    },
+    "sshPublicKey": {
+      "type": "string"
+    },
+    "virtualNetwork": {
+      "type": "object"
+    },
+    "cstorvEnable": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "cstorvName": {
+      "type": "string"
+    },
+    "cstorvVmSize": {
+      "type": "string"
+    },
+    "cstorvVmNumDisks": {
+      "type": "int"
+    },
+    "cstorvVmDiskSize": {
+      "type": "int"
+    },
+    "cstorvVmImageId": {
+      "type": "string"
+    },
+    "cclearvEnable": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "cclearvName": {
+      "type": "string",
+      "defaultValue": "cClear-V"
+    },
+    "cclearvVmSize": {
+      "type": "string",
+      "defaultValue": "Standard_D4s_v5"
+    },
+    "cclearvVmImageId": {
+      "type": "string"
+    },
+    "lbName": {
+      "type": "string"
+    },
+    "vmssName": {
+      "type": "string"
+    },
+    "vmssVmSize": {
+      "type": "string"
+    },
+    "cvuvVmImageId": {
+      "type": "string"
+    },
+    "vmssMin": {
+      "type": "int"
+    },
+    "vmssMax": {
+      "type": "int"
+    },
+    "packageUri": {
+      "type": "string",
+      "defaultValue": "https://mbrightcpacket.github.io/supreme-snail/function_app.zip"
+    },
+    "tags": {
+      "type": "object"
+    }
+  },
+  "variables": {
+    "monitoringSubnetId": "[if(equals(parameters('virtualNetwork').newOrExisting, 'new'), resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.monSubnet.name), resourceId(parameters('virtualNetwork').resourceGroup, 'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.monSubnet.name))]",
+    "lbBePoolName": "[format('{0}-backend', parameters('lbName'))]",
+    "lbPoolId": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('lbName'), variables('lbBePoolName'))]",
+    "lbProbeName": "[format('{0}-probe', parameters('lbName'))]",
+    "lbProbeId": "[resourceId('Microsoft.Network/loadBalancers/probes', parameters('lbName'), variables('lbProbeName'))]",
+    "vmssInstRepairGracePeriod": "PT10M",
+    "cstorvDataDiskDeleteOption": "Detach",
+    "autoscaleUpThreshhold": 10000000,
+    "autoscaleUpTimeGrain": "PT1M",
+    "autoscaleUpTimeWindow": "PT5M",
+    "autoscaleUpCooldown": "PT1M",
+    "autoscaleDownThreshhold": 2500000,
+    "autoscaleDownTimeGrain": "PT1M",
+    "autoscaleDownTimeWindow": "PT5M",
+    "autoscaleDownCooldown": "PT1M",
+    "linuxConfiguration": {
+      "disablePasswordAuthentication": true,
+      "ssh": {
+        "publicKeys": [
+          {
+            "path": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUser'))]",
+            "keyData": "[parameters('sshPublicKey')]"
+          }
+        ]
+      }
+    }
+  },
+  "resources": [
+    {
+      "condition": "[equals(parameters('virtualNetwork').newOrExisting, 'new')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2020-11-01",
+      "name": "[parameters('virtualNetwork').name]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": "[parameters('virtualNetwork').addressPrefixes]"
+        }
+      },
+      "tags": "[if(contains(parameters('tags'), 'Microsoft.Network/virtualNetworks'), parameters('tags')['Microsoft.Network/virtualNetworks'], null())]"
+    },
+    {
+      "condition": "[equals(parameters('virtualNetwork').newOrExisting, 'new')]",
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2020-11-01",
+      "name": "[format('{0}/{1}', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.monSubnet.name)]",
+      "properties": {
+        "addressPrefix": "[parameters('virtualNetwork').subnets.monSubnet.addressPrefix]",
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'managementSecurityGroup')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'managementSecurityGroup')]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetwork').name)]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2020-11-01",
+      "name": "[format('{0}/{1}', parameters('virtualNetwork').name, 'functions')]",
+      "properties": {
+        "addressPrefix": "10.0.10.0/24",
+        "delegations": [
+          {
+            "name": "Microsoft.Web.serverFarms",
+            "properties": {
+              "serviceName": "Microsoft.Web/serverFarms"
+            },
+            "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+          }
+        ],
+        "privateEndpointNetworkPolicies": "Disabled",
+        "privateLinkServiceNetworkPolicies": "Enabled"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetwork').name)]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2021-05-01",
+      "name": "[parameters('lbName')]",
+      "location": "[parameters('location')]",
+      "tags": "[if(contains(parameters('tags'), 'Microsoft.Network/loadBalancers'), parameters('tags')['Microsoft.Network/loadBalancers'], null())]",
+      "sku": {
+        "name": "Standard",
+        "tier": "Regional"
+      },
+      "properties": {
+        "backendAddressPools": [
+          {
+            "name": "[variables('lbBePoolName')]"
+          }
+        ],
+        "frontendIPConfigurations": [
+          {
+            "name": "[format('{0}-frontend', parameters('lbName'))]",
+            "properties": {
+              "subnet": {
+                "id": "[variables('monitoringSubnetId')]"
+              }
+            }
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "[format('{0}-to-vmss', parameters('lbName'))]",
+            "properties": {
+              "frontendPort": 0,
+              "backendPort": 0,
+              "protocol": "All",
+              "enableTcpReset": true,
+              "frontendIPConfiguration": {
+                "id": "[resourceId('Microsoft.Network/loadBalancers/frontendIpConfigurations', parameters('lbName'), format('{0}-frontend', parameters('lbName')))]"
+              },
+              "backendAddressPool": {
+                "id": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', parameters('lbName'), variables('lbBePoolName'))]"
+              },
+              "probe": {
+                "id": "[variables('lbProbeId')]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "[variables('lbProbeName')]",
+            "properties": {
+              "protocol": "Https",
+              "port": 443,
+              "requestPath": "/",
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.monSubnet.name)]"
+      ]
+    },
+    {
+      "condition": "[parameters('cstorvEnable')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2020-11-01",
+      "name": "[format('{0}-cap-nic', parameters('cstorvName'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[format('{0}-cap-ipcfg', parameters('cstorvName'))]",
+            "properties": {
+              "subnet": {
+                "id": "[variables('monitoringSubnetId')]"
+              },
+              "privateIPAllocationMethod": "Dynamic"
+            }
+          }
+        ],
+        "enableAcceleratedNetworking": true
+      },
+      "tags": "[if(contains(parameters('tags'), 'Microsoft.Network/networkInterfaces'), parameters('tags')['Microsoft.Network/networkInterfaces'], null())]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.monSubnet.name)]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetwork').name)]"
+      ]
+    },
+    {
+      "condition": "[parameters('cstorvEnable')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2021-03-01",
+      "name": "[parameters('cstorvName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('cstorvVmSize')]"
+        },
+        "storageProfile": {
+          "copy": [
+            {
+              "name": "dataDisks",
+              "count": "[length(range(0, parameters('cstorvVmNumDisks')))]",
+              "input": {
+                "name": "[format('{0}-datadisk-{1}', parameters('cstorvName'), range(0, parameters('cstorvVmNumDisks'))[copyIndex('dataDisks')])]",
+                "lun": "[range(0, parameters('cstorvVmNumDisks'))[copyIndex('dataDisks')]]",
+                "createOption": "Empty",
+                "diskSizeGB": "[parameters('cstorvVmDiskSize')]",
+                "caching": "ReadWrite",
+                "deleteOption": "[variables('cstorvDataDiskDeleteOption')]"
+              }
+            }
+          ],
+          "imageReference": {
+            "id": "[parameters('cstorvVmImageId')]"
+          },
+          "osDisk": {
+            "osType": "Linux",
+            "createOption": "FromImage",
+            "caching": "ReadWrite",
+            "deleteOption": "[variables('cstorvDataDiskDeleteOption')]"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-cap-nic', parameters('cstorvName')))]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[parameters('cstorvName')]",
+          "adminUsername": "[parameters('adminUser')]",
+          "adminPassword": "[parameters('sshPublicKey')]",
+          "linuxConfiguration": "[variables('linuxConfiguration')]"
+        }
+      },
+      "tags": "[if(contains(parameters('tags'), 'Microsoft.Compute/virtualMachines'), parameters('tags')['Microsoft.Compute/virtualMachines'], null())]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-cap-nic', parameters('cstorvName')))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetwork').name)]"
+      ]
+    },
+    {
+      "condition": "[parameters('cclearvEnable')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2020-11-01",
+      "name": "[parameters('cclearvName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "management-ipcfg",
+            "properties": {
+              "subnet": {
+                "id": "[variables('monitoringSubnetId')]"
+              },
+              "privateIPAllocationMethod": "Dynamic"
+            }
+          }
+        ],
+        "enableAcceleratedNetworking": true
+      },
+      "tags": "[if(contains(parameters('tags'), 'Microsoft.Network/networkInterfaces'), parameters('tags')['Microsoft.Network/networkInterfaces'], null())]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.monSubnet.name)]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetwork').name)]"
+      ]
+    },
+    {
+      "condition": "[parameters('cclearvEnable')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2021-03-01",
+      "name": "[parameters('cclearvName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('cclearvVmSize')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "id": "[parameters('cclearvVmImageId')]"
+          },
+          "osDisk": {
+            "osType": "Linux",
+            "createOption": "FromImage",
+            "caching": "ReadWrite",
+            "deleteOption": "Delete"
+          },
+          "dataDisks": [
+            {
+              "name": "[format('{0}-DataDisk1', parameters('cclearvName'))]",
+              "lun": 1,
+              "createOption": "Empty",
+              "diskSizeGB": 500,
+              "caching": "ReadWrite",
+              "deleteOption": "Delete"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('cclearvName'))]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[parameters('cclearvName')]",
+          "adminUsername": "[parameters('adminUser')]",
+          "adminPassword": "[parameters('sshPublicKey')]",
+          "linuxConfiguration": "[variables('linuxConfiguration')]"
+        }
+      },
+      "tags": "[if(contains(parameters('tags'), 'Microsoft.Compute/virtualMachines'), union(parameters('tags')['Microsoft.Compute/virtualMachines'], createObject('cpacket:ApplianceType', 'cclearv')), createObject('cpacket:ApplianceType', 'cclearv'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', parameters('cclearvName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetwork').name)]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "2022-11-01",
+      "name": "[parameters('vmssName')]",
+      "location": "[parameters('location')]",
+      "tags": "[if(contains(parameters('tags'), 'Microsoft.Compute/virtualMachineScaleSets'), parameters('tags')['Microsoft.Compute/virtualMachineScaleSets'], null())]",
+      "sku": {
+        "name": "[parameters('vmssVmSize')]",
+        "tier": "Standard",
+        "capacity": "[parameters('vmssMin')]"
+      },
+      "properties": {
+        "orchestrationMode": "Uniform",
+        "overprovision": false,
+        "automaticRepairsPolicy": {
+          "enabled": true,
+          "gracePeriod": "[variables('vmssInstRepairGracePeriod')]"
+        },
+        "scaleInPolicy": {
+          "rules": [
+            "Default"
+          ]
+        },
+        "upgradePolicy": {
+          "mode": "Manual"
+        },
+        "virtualMachineProfile": {
+          "osProfile": {
+            "computerNamePrefix": "[format('{0}-cvuv-', parameters('deploymentId'))]",
+            "adminUsername": "[parameters('adminUser')]",
+            "adminPassword": "[parameters('sshPublicKey')]",
+            "linuxConfiguration": "[variables('linuxConfiguration')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "id": "[parameters('cvuvVmImageId')]"
+            },
+            "osDisk": {
+              "createOption": "FromImage",
+              "osType": "Linux"
+            }
+          },
+          "networkProfile": {
+            "healthProbe": {
+              "id": "[variables('lbProbeId')]"
+            },
+            "networkInterfaceConfigurations": [
+              {
+                "name": "[format('{0}-cvuv-cap-nic', parameters('deploymentId'))]",
+                "properties": {
+                  "primary": true,
+                  "enableAcceleratedNetworking": true,
+                  "enableIPForwarding": true,
+                  "ipConfigurations": [
+                    {
+                      "name": "[format('{0}-cap-ipcfg', parameters('deploymentId'))]",
+                      "properties": {
+                        "subnet": {
+                          "id": "[variables('monitoringSubnetId')]"
+                        },
+                        "loadBalancerBackendAddressPools": [
+                          {
+                            "id": "[variables('lbPoolId')]"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/loadBalancers', parameters('lbName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.monSubnet.name)]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetwork').name)]"
+      ]
+    },
+    {
+      "type": "Microsoft.Insights/autoscalesettings",
+      "apiVersion": "2021-05-01-preview",
+      "name": "[format('{0}-autoscale', parameters('deploymentId'))]",
+      "location": "[parameters('location')]",
+      "tags": "[if(contains(parameters('tags'), 'Microsoft.Compute/virtualMachineScaleSets'), parameters('tags')['Microsoft.Compute/virtualMachineScaleSets'], null())]",
+      "properties": {
+        "name": "[format('{0}-autoscale', parameters('deploymentId'))]",
+        "targetResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]",
+        "enabled": true,
+        "profiles": [
+          {
+            "name": "[format('{0}-net-scale-prof', parameters('deploymentId'))]",
+            "capacity": {
+              "minimum": "[string(parameters('vmssMin'))]",
+              "maximum": "[string(parameters('vmssMax'))]",
+              "default": "[string(parameters('vmssMin'))]"
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "Network in Total",
+                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]",
+                  "timeGrain": "[variables('autoscaleUpTimeGrain')]",
+                  "statistic": "Average",
+                  "timeWindow": "[variables('autoscaleUpTimeWindow')]",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": "[variables('autoscaleUpThreshhold')]"
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": "1",
+                  "cooldown": "[variables('autoscaleUpCooldown')]"
+                }
+              },
+              {
+                "metricTrigger": {
+                  "metricName": "Network in Total",
+                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]",
+                  "timeGrain": "[variables('autoscaleDownTimeGrain')]",
+                  "statistic": "Average",
+                  "timeWindow": "[variables('autoscaleDownTimeWindow')]",
+                  "timeAggregation": "Average",
+                  "operator": "LessThan",
+                  "threshold": "[variables('autoscaleDownThreshhold')]"
+                },
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": "1",
+                  "cooldown": "[variables('autoscaleDownCooldown')]"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2023-02-01",
+      "name": "managementSecurityGroup",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "allow-ssh",
+            "properties": {
+              "priority": 100,
+              "protocol": "Tcp",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "22"
+            }
+          },
+          {
+            "name": "allow-https",
+            "properties": {
+              "priority": 110,
+              "protocol": "Tcp",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-09-01",
+      "name": "registerangryhippo",
+      "kind": "elastic",
+      "location": "[parameters('location')]",
+      "properties": {
+        "perSiteScaling": false,
+        "elasticScaleEnabled": true,
+        "maximumElasticWorkerCount": 1,
+        "isSpot": false,
+        "reserved": true,
+        "isXenon": false,
+        "hyperV": false,
+        "targetWorkerCount": 0,
+        "targetWorkerSizeId": 0,
+        "zoneRedundant": false
+      },
+      "sku": {
+        "name": "EP1",
+        "tier": "ElasticPremium",
+        "size": "EP1",
+        "family": "EP",
+        "capacity": 1
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2022-09-01",
+      "name": "registerangryhippo",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "location": "[parameters('location')]",
+      "tags": {},
+      "properties": {
+        "minimumTlsVersion": "TLS1_0",
+        "allowBlobPublicAccess": true,
+        "networkAcls": {
+          "bypass": "AzureServices",
+          "virtualNetworkRules": [],
+          "ipRules": [],
+          "defaultAction": "Allow"
+        },
+        "supportsHttpsTrafficOnly": true,
+        "encryption": {
+          "services": {
+            "file": {
+              "keyType": "Account",
+              "enabled": true
+            },
+            "blob": {
+              "keyType": "Account",
+              "enabled": true
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        },
+        "accessTier": "Hot"
+      }
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "registerangryhippo",
+      "location": "[parameters('location')]",
+      "tags": {},
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "Request_Source": "rest",
+        "RetentionInDays": 90,
+        "IngestionMode": "ApplicationInsights",
+        "publicNetworkAccessForIngestion": "Enabled",
+        "publicNetworkAccessForQuery": "Enabled"
+      }
+    },
+    {
+      "type": "Microsoft.EventGrid/systemTopics",
+      "apiVersion": "2022-06-15",
+      "name": "vmss-events",
+      "properties": {
+        "source": "[resourceGroup().id]",
+        "topicType": "Microsoft.Resources.ResourceGroups"
+      },
+      "identity": {
+        "type": "None"
+      },
+      "location": "global",
+      "tags": {}
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-03-01",
+      "name": "registerangryhippo",
+      "location": "[parameters('location')]",
+      "kind": "functionapp,linux",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "clientAffinityEnabled": false,
+        "clientCertEnabled": false,
+        "clientCertMode": "Required",
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "enabled": true,
+        "hostNamesDisabled": false,
+        "httpsOnly": false,
+        "hyperV": false,
+        "isXenon": false,
+        "keyVaultReferenceIdentity": "SystemAssigned",
+        "publicNetworkAccess": "Disabled",
+        "redundancyMode": "None",
+        "reserved": true,
+        "scmSiteAlsoStopped": false,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', 'registerangryhippo')]",
+        "siteConfig": {
+          "acrUseManagedIdentityCreds": false,
+          "alwaysOn": false,
+          "functionAppScaleLimit": 0,
+          "http20Enabled": true,
+          "linuxFxVersion": "Python|3.10",
+          "minimumElasticInstanceCount": 1,
+          "numberOfWorkers": 1,
+          "pythonVersion": "3.10",
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', 'registerangryhippo'), '2020-02-02').InstrumentationKey]"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', 'registerangryhippo', environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', 'registerangryhippo'), '2022-09-01').keys[0].value)]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~4"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "python"
+            },
+            {
+              "name": "WEBSITE_RUN_FROM_PACKAGE",
+              "value": "0"
+            }
+          ]
+        },
+        "storageAccountRequired": false,
+        "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, 'functions')]",
+        "vnetContentShareEnabled": false,
+        "vnetImagePullEnabled": false,
+        "vnetRouteAllEnabled": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, 'functions')]",
+        "[resourceId('Microsoft.Web/serverfarms', 'registerangryhippo')]",
+        "[resourceId('Microsoft.Insights/components', 'registerangryhippo')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', 'registerangryhippo')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/sites/functions",
+      "apiVersion": "2022-09-01",
+      "name": "[format('{0}/{1}', 'registerangryhippo', 'appliance_registration')]",
+      "properties": {
+        "script_href": "https://registerangryhippo.azurewebsites.net/admin/vfs/home/site/wwwroot/function_app.py",
+        "test_data_href": "https://registerangryhippo.azurewebsites.net/admin/vfs/home/data/Functions/sampledata/appliance_registration.dat",
+        "href": "https://registerangryhippo.azurewebsites.net/admin/functions/appliance_registration",
+        "config": {
+          "name": "appliance_registration",
+          "entryPoint": "appliance_registration",
+          "scriptFile": "function_app.py",
+          "language": "python",
+          "functionDirectory": "/home/site/wwwroot",
+          "bindings": [
+            {
+              "direction": "IN",
+              "type": "eventGridTrigger",
+              "name": "event"
+            }
+          ]
+        },
+        "test_data": "",
+        "language": "python",
+        "isDisabled": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', 'registerangryhippo')]"
+      ]
+    },
+    {
+      "type": "Microsoft.EventGrid/eventSubscriptions",
+      "apiVersion": "2023-06-01-preview",
+      "name": "rgevents",
+      "properties": {
+        "destination": {
+          "properties": {
+            "resourceId": "[resourceId('Microsoft.Web/sites/functions', 'registerangryhippo', 'appliance_registration')]",
+            "maxEventsPerBatch": 1,
+            "preferredBatchSizeInKilobytes": 64
+          },
+          "endpointType": "AzureFunction"
+        },
+        "filter": {
+          "subjectBeginsWith": "",
+          "subjectEndsWith": "",
+          "includedEventTypes": [
+            "Microsoft.Resources.ResourceWriteSuccess",
+            "Microsoft.Resources.ResourceWriteFailure",
+            "Microsoft.Resources.ResourceWriteCancel",
+            "Microsoft.Resources.ResourceDeleteSuccess",
+            "Microsoft.Resources.ResourceDeleteFailure",
+            "Microsoft.Resources.ResourceDeleteCancel",
+            "Microsoft.Resources.ResourceActionSuccess",
+            "Microsoft.Resources.ResourceActionFailure",
+            "Microsoft.Resources.ResourceActionCancel"
+          ],
+          "enableAdvancedFilteringOnArrays": true
+        },
+        "labels": [],
+        "eventDeliverySchema": "EventGridSchema",
+        "retryPolicy": {
+          "maxDeliveryAttempts": 30,
+          "eventTimeToLiveInMinutes": 1440
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites/functions', 'registerangryhippo', 'appliance_registration')]",
+        "[resourceId('Microsoft.EventGrid/systemTopics', 'vmss-events')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/sites/extensions",
+      "apiVersion": "2021-02-01",
+      "name": "[format('{0}/{1}', 'registerangryhippo', 'MSDeploy')]",
+      "properties": {
+        "packageUri": "[parameters('packageUri')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', 'registerangryhippo')]"
+      ]
+    }
+  ]
+}
