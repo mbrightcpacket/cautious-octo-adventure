@@ -23,7 +23,7 @@ https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.github
 The Create UI definition file is:
 
 ```bash
-https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/createUiDefinition.json
+https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/createUIDefinition.json
 ```
 
 URL encoded, this is:
@@ -38,7 +38,11 @@ Using the create UI definition file to provide the forms:
 https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Fmain%2Fmain.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Fmain%2FcreateUiDefinition.json
 ```
 
+[![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FcPacketNetworks%2Fazure-deployer%2Flatest%2Fmain.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FcPacketNetworks%2Fazure-deployer%2Flatest%2FcreateUiDefinition.json)
+
+(https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FcPacketNetworks%2Fazure-deployer%2Flatest%2Fmain.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FcPacketNetworks%2Fazure-deployer%2Flatest%2FcreateUiDefinition.json)
+
+
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Fmain%2Fmain.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Fmain%2FcreateUiDefinition.json)
 
-```bash
 [azure-button]: https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-to-azure-button
