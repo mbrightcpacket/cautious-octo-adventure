@@ -10,9 +10,12 @@ build: format
 .PHONY: format
 format:
 	az bicep format --file main.bicep
-	# jq -r '.' parameters.json | sponge parameters.json
 	find . -type f -name "*.sh" -exec shfmt --diff --case-indent --indent 2 -w {} \;
 	find . -type f -name "*.py" -exec black {} \;
+
+.PHONY: json
+json:
+	jq -r '.' parameters.json | sponge parameters.json
 
 .PHONY: lint
 lint:

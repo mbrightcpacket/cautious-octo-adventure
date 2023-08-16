@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "15389068930250982993"
+      "templateHash": "4672266374044060500"
     }
   },
   "parameters": {
@@ -78,7 +78,7 @@
     },
     "packageUri": {
       "type": "string",
-      "defaultValue": "https://mbrightcpacket.github.io/supreme-snail/function_app.zip"
+      "defaultValue": "https://mbrightcpacket.github.io/cautious-octo-adventure/function_app.zip"
     },
     "tags": {
       "type": "object"
