@@ -6,7 +6,7 @@
         "config": {
             "isWizard": true,
             "basics": { 
-                "description": "# cCloud cVu-V Azure VMSS deployment tool \n This configuration application helps you deploy cPacket cVu-V packet brokers into an Azure Virtual Machine Scale Set (VMSS) \n # Prequiquisites \n The following are required before starting this process: \n - x \n - y \n - z \n # Recommended \n - An azure VNet and subnet with minimum of /28 for deployment of the broker appliances. \n # See also \n - [cPacket's Website](https://www.cpacket.com)\n",
+                "description": "# cCloud cVu-V Azure VMSS deployment tool \n This configuration application helps you deploy cPacket cVu-V packet brokers into an Azure Virtual Machine Scale Set (VMSS) \n # Prerequisites \n The following are required before starting this process: \n - x \n - y \n - z \n # Recommended \n - An azure VNet and subnet with minimum of /28 for deployment of the broker appliances. \n # See also \n - [cPacket's Website](https://www.cpacket.com)\n",
                 "subscription": {
                     "constraints": {
                         "validations": [
