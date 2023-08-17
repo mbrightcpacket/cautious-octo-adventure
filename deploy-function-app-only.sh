@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -e
+set -x
+
+# Variables that must be changed
+
+# shellcheck disable=SC2034
+location="eastus2"
+resource_group="mbright-bicep-test"
+app_name="registerangryhippo"
+storage_name="$app_name"
+# plan_name="$app_name"
+
+# Avoid changing the code below
+
+# Choose EP1 to get vnet integration
+# plan_id="$(az functionapp plan create \
+#   --name "$plan_name" \
+#   --resource-group "$resource_group" \
+#   --is-linux true \
+#   --sku EP1 \
+#   --query 'id' \
+#   --output tsv)"
+plan_id="$(az appservice plan list -g "$resource_group" -o tsv --query '[0].id')"
+
+# Not sure if this is strictly required
+# az storage account create \
+#   --name "$storage_name" \
+#   --location "$location" \
+#   --resource-group "$resource_group" \
+#   --sku Standard_LRS
+# storage_account_id="$(az storage account list -g "$resource_group" -o tsv --query '[0].id')"
+
+az functionapp create \
+  --resource-group "$resource_group" \
+  --runtime python \
+  --runtime-version 3.10 \
+  --functions-version 4 \
+  --name "$app_name" \
+  --os-type linux \
+  --storage-account "$storage_name" \
+  --plan "$plan_id"
+
+# Assign system assigned managed identity to function app
+az functionapp identity assign \
+  --name "$app_name" \
+  --resource-group "$resource_group"
+
+assignee_object="$(az functionapp identity show \
+  --name "$app_name" \
+  --resource-group "$resource_group" \
+  --query "principalId" \
+  --output tsv)"
+
+# Should be scoped to resource group with --scope
+# Defaults to scope == resource group
+az role assignment create \
+  --role "Contributor" \
+  --assignee-object-id "$assignee_object" \
+  --resource-group "$resource_group"
+
+az functionapp config appsettings set \
+  --name "$app_name" \
+  --resource-group "$resource_group" \
+  --settings AzureWebJobsFeatureFlags=EnableWorkerIndexing
+
+# publish function code
+func azure functionapp publish "$app_name"
