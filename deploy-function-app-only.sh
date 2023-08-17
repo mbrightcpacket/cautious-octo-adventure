@@ -72,9 +72,9 @@ az functionapp config appsettings set \
 
 # https://github.com/Azure-Samples/function-app-arm-templates/wiki/Best-Practices-Guide#zipdeploy-run-from-package-with-arm-template
 az functionapp config appsettings set \
-   --name "$app_name" \
-   --resource-group "$resource_group" \
-   --settings "WEBSITE_RUN_FROM_PACKAGE=0"
+  --name "$app_name" \
+  --resource-group "$resource_group" \
+  --settings "WEBSITE_RUN_FROM_PACKAGE=0"
 
 # publish function code
 # func azure functionapp publish "$app_name"
