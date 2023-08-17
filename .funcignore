@@ -1,0 +1,11 @@
+.git
+.mypy_cache
+Makefile
+README.md
+createUIDefinition.json
+deploy-function-app-only.sh
+deploy.sh
+deployment.png
+function_app.zip
+main.bicep
+main.json
