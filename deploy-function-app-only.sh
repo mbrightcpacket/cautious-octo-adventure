@@ -9,7 +9,8 @@ location="eastus2"
 resource_group="mbright-bicep-test"
 app_name="registerangryhippo"
 storage_name="$app_name"
-# plan_name="$app_name"
+zip_file="function_app.zip"
+#plan_name="$app_name"
 
 # Avoid changing the code below
 
@@ -64,5 +65,24 @@ az functionapp config appsettings set \
   --resource-group "$resource_group" \
   --settings AzureWebJobsFeatureFlags=EnableWorkerIndexing
 
+az functionapp config appsettings set \
+  --name "$app_name" \
+  --resource-group "$resource_group" \
+  --settings "SCM_DO_BUILD_DURING_DEPLOYMENT=true"
+
+# https://github.com/Azure-Samples/function-app-arm-templates/wiki/Best-Practices-Guide#zipdeploy-run-from-package-with-arm-template
+# az functionapp config appsettings set \
+#   --name "$app_name" \
+#   --resource-group "$resource_group" \
+#   --settings "WEBSITE_RUN_FROM_PACKAGE=0"
+
 # publish function code
-func azure functionapp publish "$app_name"
+# func azure functionapp publish "$app_name"
+
+zip -r function_app.zip function_app.py host.json requirements.txt
+
+az functionapp deployment source config-zip \
+  --resource-group "$resource_group" \
+  --name "$app_name" \
+  --src "$zip_file" \
+  --build-remote true
