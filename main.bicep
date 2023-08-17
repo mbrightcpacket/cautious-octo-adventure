@@ -80,10 +80,9 @@ param tags object
 
 // compute the subnet IDs depending on whether they exist.
 var monitoringSubnetId = virtualNetwork.newOrExisting == 'new' ? monitoringsubnet.id : resourceId(virtualNetwork.resourceGroup, 'Microsoft.Network/virtualNetworks/subnets', virtualNetwork.name, virtualNetwork.subnets.monSubnet.name)
-// var mgmtsubnetId = virtualNetwork.newOrExisting == 'new' ? mgmtsubnet.id : resourceId(virtualNetwork.resourceGroup, 'Microsoft.Network/virtualNetworks/subnets', virtualNetwork.name, virtualNetwork.subnets.mgmtSubnet.name)
 
-//ANDY NOTE: TODO: make sure 60 is a reasonable value - guessing between 60 and 300.
-//see: https://learn.microsoft.com/en-us/azure/templates/microsoft.network/loadbalancers?pivots=deployment-language-bicep#backendaddresspoolpropertiesformat
+// ANDY NOTE: TODO: make sure 60 is a reasonable value - guessing between 60 and 300.
+// see: https://learn.microsoft.com/en-us/azure/templates/microsoft.network/loadbalancers?pivots=deployment-language-bicep#backendaddresspoolpropertiesformat
 // var lbDrainPeriodInSecs = 60
 // var lbIdleTimeoutInMinutes = 5
 var lbBePoolName = '${lbName}-backend'
