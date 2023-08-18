@@ -159,10 +159,23 @@
                             "hideExisting": false
                         },
                         "subnets": {
-                            "monSubnet": {
+                            "monitoringSubnet": {
                                 "label": "Monitoring subnet",
                                 "defaultValue": {
                                     "name": "monitor-subnet",
+                                    "addressPrefixSize": "/24"
+                                },
+                                "constraints": {
+                                    "required": true,
+                                    "minAddressPrefixSize": "/28",
+                                    "minAddressCount": 10,
+                                    "requireContiguousAddresses": false
+                                }
+                            },
+                            "functionsSubnet": {
+                                "label": "Azure Functions App subnet",
+                                "defaultValue": {
+                                    "name": "functions-subnet",
                                     "addressPrefixSize": "/24"
                                 },
                                 "constraints": {

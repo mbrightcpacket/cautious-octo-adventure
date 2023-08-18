@@ -78,7 +78,7 @@ param tags object
 // Variables - start
 
 // compute the subnet IDs depending on whether they exist.
-var monitoringSubnetId = virtualNetwork.newOrExisting == 'new' ? monitoringsubnet.id : resourceId(virtualNetwork.resourceGroup, 'Microsoft.Network/virtualNetworks/subnets', virtualNetwork.name, virtualNetwork.subnets.monSubnet.name)
+var monitoringSubnetId = virtualNetwork.newOrExisting == 'new' ? monitoringsubnet.id : resourceId(virtualNetwork.resourceGroup, 'Microsoft.Network/virtualNetworks/subnets', virtualNetwork.name, virtualNetwork.subnets.monitoringSubnet.name)
 
 // ANDY NOTE: TODO: make sure 60 is a reasonable value - guessing between 60 and 300.
 // see: https://learn.microsoft.com/en-us/azure/templates/microsoft.network/loadbalancers?pivots=deployment-language-bicep#backendaddresspoolpropertiesformat
@@ -169,21 +169,22 @@ resource observabilityVnet 'Microsoft.Network/virtualNetworks@2020-11-01' = if (
 }
 
 resource monitoringsubnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' = if (virtualNetwork.newOrExisting == 'new') {
-  name: virtualNetwork.subnets.monSubnet.name
+  name: virtualNetwork.subnets.monitoringSubnet.name
   parent: observabilityVnet
   properties: {
-    addressPrefix: virtualNetwork.subnets.monSubnet.addressPrefix
+    addressPrefix: virtualNetwork.subnets.monitoringSubnet.addressPrefix
     networkSecurityGroup: {
       id: managementSecurityGroup.id
     }
   }
 }
 
-resource functionssubnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' = {
-  name: 'functions'
+resource functionssubnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' = if (virtualNetwork.newOrExisting == 'new') {
+  name: virtualNetwork.subnets.monitoringSubnet.name
   parent: observabilityVnet
   properties: {
-    addressPrefix: cidrSubnet(virtualNetwork.addressPrefixes[0], 24, 11)
+    addressPrefix: virtualNetwork.subnets.functionsSubnet.addressPrefix
+    // addressPrefix: cidrSubnet(virtualNetwork.addressPrefixes[0], 24, 11)
     delegations: [
       {
         name: 'Microsoft.Web.serverFarms'
