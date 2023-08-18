@@ -910,7 +910,7 @@ resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-03-01' = {
       alwaysOn: false
       functionAppScaleLimit: 0
       http20Enabled: true
-      linuxFxVersion: 'Python|3.10'
+      // linuxFxVersion: 'Python|3.10'
       minimumElasticInstanceCount: 1
       numberOfWorkers: 1
       pythonVersion: '3.10'

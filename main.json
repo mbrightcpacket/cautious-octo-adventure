@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "2196966328981644814"
+      "templateHash": "3436080858841354391"
     }
   },
   "parameters": {
@@ -687,7 +687,6 @@
           "alwaysOn": false,
           "functionAppScaleLimit": 0,
           "http20Enabled": true,
-          "linuxFxVersion": "Python|3.10",
           "minimumElasticInstanceCount": 1,
           "numberOfWorkers": 1,
           "pythonVersion": "3.10",
