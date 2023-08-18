@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "9932382845711242076"
+      "templateHash": "2196966328981644814"
     }
   },
   "parameters": {
@@ -147,7 +147,7 @@
       "apiVersion": "2020-11-01",
       "name": "[format('{0}/{1}', parameters('virtualNetwork').name, 'functions')]",
       "properties": {
-        "addressPrefix": "[cidrSubnet(parameters('virtualNetwork').addressPrefixes[0], 24, 10)]",
+        "addressPrefix": "[cidrSubnet(parameters('virtualNetwork').addressPrefixes[0], 24, 11)]",
         "delegations": [
           {
             "name": "Microsoft.Web.serverFarms",

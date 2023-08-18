@@ -64,7 +64,6 @@ param packageUri string = 'https://mbrightcpacket.github.io/cautious-octo-advent
 // param dsTool9 string
 // param dsTool10 string
 
-// monitoring
 // param notifyEmail string
 
 // Docs: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/tag-support
@@ -184,7 +183,7 @@ resource functionssubnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' 
   name: 'functions'
   parent: observabilityVnet
   properties: {
-    addressPrefix: cidrSubnet(virtualNetwork.addressPrefixes[0], 24, 10)
+    addressPrefix: cidrSubnet(virtualNetwork.addressPrefixes[0], 24, 11)
     delegations: [
       {
         name: 'Microsoft.Web.serverFarms'
