@@ -933,7 +933,7 @@ resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-03-01' = {
         }
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '0'
+          value: '1'
         }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'

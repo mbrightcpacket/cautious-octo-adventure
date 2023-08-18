@@ -337,7 +337,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "Max VM count",
                         "placeholder": "",
-                        "defaultValue": "10",
+                        "defaultValue": "5",
                         "toolTip": "The maximum number of VMs to scale to.",
                         "visible": true
                     },
@@ -346,7 +346,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "Downstream tool 1",
                         "placeholder": "",
-                        "defaultValue": "a.b.c.d",
+                        "defaultValue": "10.12.14.16",
                         "toolTip": "Downstream tool to send packets to (VXLAN)",
                         "visible": true,
 						"constraints": {
