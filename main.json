@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "16699458092109679851"
+      "templateHash": "6319501440196376569"
     }
   },
   "parameters": {
@@ -714,7 +714,7 @@
             },
             {
               "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
-              "value": "true"
+              "value": "false"
             }
           ]
         },
