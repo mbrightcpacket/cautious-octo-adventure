@@ -1,1 +1,11 @@
 local.settings.json
+Makefile
+README.md
+createUIDefinition.json
+deploy-function-app-only.sh
+deploy.sh
+deployment.png
+getting_started.md
+local.settings.json
+main.bicep
+main.json
