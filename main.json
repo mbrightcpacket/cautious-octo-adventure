@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "6319501440196376569"
+      "templateHash": "1518390628069098964"
     }
   },
   "parameters": {
@@ -146,7 +146,7 @@
       "condition": "[equals(parameters('virtualNetwork').newOrExisting, 'new')]",
       "type": "Microsoft.Network/virtualNetworks/subnets",
       "apiVersion": "2020-11-01",
-      "name": "[format('{0}/{1}', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.monitoringSubnet.name)]",
+      "name": "[format('{0}/{1}', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.functionsSubnet.name)]",
       "properties": {
         "addressPrefix": "[parameters('virtualNetwork').subnets.functionsSubnet.addressPrefix]",
         "delegations": [
@@ -719,13 +719,13 @@
           ]
         },
         "storageAccountRequired": false,
-        "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.monitoringSubnet.name)]",
+        "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.functionsSubnet.name)]",
         "vnetContentShareEnabled": false,
         "vnetImagePullEnabled": false,
         "vnetRouteAllEnabled": false
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.monitoringSubnet.name)]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.functionsSubnet.name)]",
         "[resourceId('Microsoft.Web/serverfarms', 'registerangryhippo')]",
         "[resourceId('Microsoft.Insights/components', 'registerangryhippo')]",
         "[resourceId('Microsoft.Storage/storageAccounts', 'registerangryhippo')]"

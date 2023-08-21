@@ -50,7 +50,7 @@ param cvuvVmImageId string
 param vmssMin int
 param vmssMax int
 
-param packageUri string = 'https://mbrightcpacket.github.io/cautious-octo-adventure/function_app.zip'
+param packageUri string = 'https://github.com/mbrightcpacket/cautious-octo-adventure/releases/download/deploying-minus-function/function_app.zip'
 
 // cvuv downstream tool IPs - must go into generated user-data
 // param dsTool1 string
@@ -180,7 +180,7 @@ resource monitoringsubnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01'
 }
 
 resource functionssubnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' = if (virtualNetwork.newOrExisting == 'new') {
-  name: virtualNetwork.subnets.monitoringSubnet.name
+  name: virtualNetwork.subnets.functionsSubnet.name
   parent: observabilityVnet
   properties: {
     addressPrefix: virtualNetwork.subnets.functionsSubnet.addressPrefix
