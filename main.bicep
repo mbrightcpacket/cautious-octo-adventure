@@ -862,93 +862,93 @@ resource vmssevents 'Microsoft.EventGrid/systemTopics@2022-06-15' = {
 }
 
 // Function App (not to be confused with function)
-resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-03-01' = {
-  name: 'registerangryhippo'
-  location: location
-  // tags: {}
-  kind: 'functionapp,linux'
-  // extendedLocation: 
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    clientAffinityEnabled: false
-    clientCertEnabled: false
-    // clientCertExclusionPaths: 'string'
-    clientCertMode: 'Required'
-    // cloningInfo: {}
-    containerSize: 0
-    // customDomainVerificationId: 'E9894CA4C1882ED2CD721B3E6BED48800A7C9E248560A3D805E49D787E2B4796'
-    dailyMemoryTimeQuota: 0
-    enabled: true
-    // hostingEnvironmentProfile: {
-    //     
-    // } 
-    hostNamesDisabled: false
-    // hostNameSslStates: [
-    //   {
-    //     name: 'registerangryhippo.azurewebsites.net'
-    //     sslState: 'Disabled'
-    //     hostType: 'Standard'
-    //   }
-    //   {
-    //     name: 'registerangryhippo.scm.azurewebsites.net'
-    //     sslState: 'Disabled'
-    //     hostType: 'Repository'
-    //   }
-    // ]
-    httpsOnly: false
-    hyperV: false
-    isXenon: false
-    keyVaultReferenceIdentity: 'SystemAssigned'
-    publicNetworkAccess: 'Disabled'
-    redundancyMode: 'None'
-    reserved: true
-    scmSiteAlsoStopped: false
-    serverFarmId: hostplan.id
-    siteConfig: {
-      acrUseManagedIdentityCreds: false
-      alwaysOn: false
-      functionAppScaleLimit: 0
-      http20Enabled: true
-      // linuxFxVersion: 'Python|3.10'
-      minimumElasticInstanceCount: 1
-      numberOfWorkers: 1
-      pythonVersion: '3.10'
-      appSettings: [
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: registerangryhippoMonitoring.properties.InstrumentationKey
-        }
-        {
-          name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${registerangryhippoStorage.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${registerangryhippoStorage.listKeys().keys[0].value}'
-        }
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
-        }
-        {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'python'
-        }
-        {
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1'
-        }
-        {
-          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'false'
-        }
-      ]
-    }
-    storageAccountRequired: false
-    virtualNetworkSubnetId: functionssubnet.id
-    vnetContentShareEnabled: false
-    vnetImagePullEnabled: false
-    vnetRouteAllEnabled: false
-  }
-}
+// resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-03-01' = {
+//   name: 'registerangryhippo'
+//   location: location
+//   // tags: {}
+//   kind: 'functionapp,linux'
+//   // extendedLocation: 
+//   identity: {
+//     type: 'SystemAssigned'
+//   }
+//   properties: {
+//     clientAffinityEnabled: false
+//     clientCertEnabled: false
+//     // clientCertExclusionPaths: 'string'
+//     clientCertMode: 'Required'
+//     // cloningInfo: {}
+//     containerSize: 0
+//     // customDomainVerificationId: 'E9894CA4C1882ED2CD721B3E6BED48800A7C9E248560A3D805E49D787E2B4796'
+//     dailyMemoryTimeQuota: 0
+//     enabled: true
+//     // hostingEnvironmentProfile: {
+//     //     
+//     // } 
+//     hostNamesDisabled: false
+//     // hostNameSslStates: [
+//     //   {
+//     //     name: 'registerangryhippo.azurewebsites.net'
+//     //     sslState: 'Disabled'
+//     //     hostType: 'Standard'
+//     //   }
+//     //   {
+//     //     name: 'registerangryhippo.scm.azurewebsites.net'
+//     //     sslState: 'Disabled'
+//     //     hostType: 'Repository'
+//     //   }
+//     // ]
+//     httpsOnly: false
+//     hyperV: false
+//     isXenon: false
+//     keyVaultReferenceIdentity: 'SystemAssigned'
+//     publicNetworkAccess: 'Disabled'
+//     redundancyMode: 'None'
+//     reserved: true
+//     scmSiteAlsoStopped: false
+//     serverFarmId: hostplan.id
+//     siteConfig: {
+//       acrUseManagedIdentityCreds: false
+//       alwaysOn: false
+//       functionAppScaleLimit: 0
+//       http20Enabled: true
+//       // linuxFxVersion: 'Python|3.10'
+//       minimumElasticInstanceCount: 1
+//       numberOfWorkers: 1
+//       pythonVersion: '3.10'
+//       appSettings: [
+//         {
+//           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+//           value: registerangryhippoMonitoring.properties.InstrumentationKey
+//         }
+//         {
+//           name: 'AzureWebJobsStorage'
+//           value: 'DefaultEndpointsProtocol=https;AccountName=${registerangryhippoStorage.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${registerangryhippoStorage.listKeys().keys[0].value}'
+//         }
+//         {
+//           name: 'FUNCTIONS_EXTENSION_VERSION'
+//           value: '~4'
+//         }
+//         {
+//           name: 'FUNCTIONS_WORKER_RUNTIME'
+//           value: 'python'
+//         }
+//         {
+//           name: 'WEBSITE_RUN_FROM_PACKAGE'
+//           value: '1'
+//         }
+//         {
+//           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+//           value: 'false'
+//         }
+//       ]
+//     }
+//     storageAccountRequired: false
+//     virtualNetworkSubnetId: functionssubnet.id
+//     vnetContentShareEnabled: false
+//     vnetImagePullEnabled: false
+//     vnetRouteAllEnabled: false
+//   }
+// }
 
 resource applianceregistration 'Microsoft.Web/sites/functions@2022-09-01' = {
   parent: registerangryhippoFunctionApp
@@ -1028,3 +1028,128 @@ resource zipDeploy 'Microsoft.Web/sites/extensions@2021-02-01' = {
 
 // Resources - end
 //////////////////////////////////////////////////////////////////////////////
+
+resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
+  name: 'registerangryhippo'
+  kind: 'functionapp,linux,container'
+  location: location
+  tags: {
+    owner: 'mbright@cpacketnetworks.com'
+    'hidden-link: /app-insights-resource-id': '/subscriptions/93004638-8c6b-4e33-ba58-946afd57efdf/resourceGroups/mbright-bicep-test/providers/Microsoft.Insights/components/registerangryhippo'
+  }
+  properties: {
+    // name: 'registerangryhippo'
+    // webSpace: 'mbright-bicep-test-EastUS2webspace-Linux'
+    // selfLink: 'https://waws-prod-bn1-199.api.azurewebsites.windows.net:454/subscriptions/93004638-8c6b-4e33-ba58-946afd57efdf/webspaces/mbright-bicep-test-EastUS2webspace-Linux/sites/registerangryhippo'
+    enabled: true
+    // adminEnabled: true
+    // siteProperties: {
+    //   metadata: null
+    //   properties: [
+    //     {
+    //       name: 'LinuxFxVersion'
+    //       value: 'DOCKER|mcr.microsoft.com/azure-functions/dotnet:4-appservice-quickstart'
+    //     }
+    //     {
+    //       name: 'WindowsFxVersion'
+    //       value: null
+    //     }
+    //   ]
+    //   appSettings: null
+    // }
+    // csrs: []
+    hostNameSslStates: [
+      {
+        name: 'registerangryhippo.azurewebsites.net'
+        sslState: 'Disabled'
+        // ipBasedSslState: 'NotConfigured'
+        hostType: 'Standard'
+      }
+      {
+        name: 'registerangryhippo.scm.azurewebsites.net'
+        sslState: 'Disabled'
+        // ipBasedSslState: 'NotConfigured'
+        hostType: 'Repository'
+      }
+    ]
+    serverFarmId: hostplan.id
+    reserved: true
+    isXenon: false
+    hyperV: false
+    // storageRecoveryDefaultState: 'Running'
+    // contentAvailabilityState: 'Normal'
+    // runtimeAvailabilityState: 'Normal'
+    // dnsConfiguration: {}
+    vnetRouteAllEnabled: false
+    vnetImagePullEnabled: false
+    vnetContentShareEnabled: false
+    siteConfig: {
+      numberOfWorkers: 1
+      linuxFxVersion: 'DOCKER|mcr.microsoft.com/azure-functions/dotnet:4-appservice-quickstart'
+      acrUseManagedIdentityCreds: false
+      alwaysOn: false
+      http20Enabled: false
+      functionAppScaleLimit: 0
+      minimumElasticInstanceCount: 1
+      appSettings: [
+        {
+          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+          value: registerangryhippoMonitoring.properties.InstrumentationKey
+        }
+        {
+          name: 'AzureWebJobsStorage'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${registerangryhippoStorage.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${registerangryhippoStorage.listKeys().keys[0].value}'
+        }
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~4'
+        }
+        {
+          name: 'FUNCTIONS_WORKER_RUNTIME'
+          value: 'python'
+        }
+        {
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1'
+        }
+        {
+          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+          value: 'false'
+        }
+      ]
+    }
+    // deploymentId: 'registerangryhippo'
+    // sku: 'ElasticPremium'
+    scmSiteAlsoStopped: false
+    clientAffinityEnabled: false
+    clientCertEnabled: false
+    clientCertMode: 'Required'
+    hostNamesDisabled: false
+    // vnetBackupRestoreEnabled: false
+    // customDomainVerificationId: 'E9894CA4C1882ED2CD721B3E6BED48800A7C9E248560A3D805E49D787E2B4796'
+    // kind: 'functionapp,linux,container'
+    // inboundIpAddress: '20.119.136.11'
+    // possibleInboundIpAddresses: '20.119.136.11'
+    // ftpUsername: 'registerangryhippo\\$registerangryhippo'
+    // ftpsHostName: 'ftps://waws-prod-bn1-199.ftp.azurewebsites.windows.net/site/wwwroot'
+    containerSize: 1536
+    dailyMemoryTimeQuota: 0
+    // siteDisabledReason: 0
+    // homeStamp: 'waws-prod-bn1-199'
+    // tags: {
+    //   owner: 'mbright@cpacketnetworks.com'
+    //   'hidden-link: /app-insights-resource-id': '/subscriptions/93004638-8c6b-4e33-ba58-946afd57efdf/resourceGroups/mbright-bicep-test/providers/Microsoft.Insights/components/registerangryhippo'
+    // }
+    httpsOnly: true
+    // endToEndEncryptionEnabled: false
+    redundancyMode: 'None'
+    // privateEndpointConnections: []
+    publicNetworkAccess: 'Enabled'
+    // eligibleLogCategories: 'FunctionAppLogs'
+    // inFlightFeatures: []
+    storageAccountRequired: false
+    keyVaultReferenceIdentity: 'SystemAssigned'
+    // defaultHostNameScope: 'Global'
+    virtualNetworkSubnetId: functionssubnet.id
+  }
+}
