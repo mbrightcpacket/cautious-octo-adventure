@@ -1,10 +1,10 @@
-import azure.functions as func
 import logging
 import json
 import requests
 import hashlib
 import re
 
+import azure.functions as func
 import azure.keyvault.secrets
 import azure.core.credentials
 import azure.identity

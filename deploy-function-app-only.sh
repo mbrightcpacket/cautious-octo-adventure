@@ -76,6 +76,8 @@ az functionapp config appsettings set \
   --resource-group "$resource_group" \
   --settings "WEBSITE_RUN_FROM_PACKAGE=0"
 
+# az webapp config appsettings set --resource-group <group-name> --name <app-name> --settings WEBSITE_RUN_FROM_PACKAGE="1"
+
 # publish function code
 # func azure functionapp publish "$app_name"
 

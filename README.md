@@ -1,6 +1,6 @@
 # cautious-octo-adventure
 
-> Caution: This is pre-release software and should not be used in production.
+> Caution: This is unofficial, pre-release software, and should NOT be used in production.
 
 Every ["Azure button"][azure-button] starts with:
 
