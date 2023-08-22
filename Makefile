@@ -1,4 +1,9 @@
 default := all
+dockerid := mbrightcpacket
+dockerimage := registerappliances
+dockerversion := 0.0.1
+azurefunction := registerangryhippo
+resourcegroup := mbright-bicep-test
 
 .PHONY: all
 all: build format
@@ -23,7 +28,7 @@ lint:
 
 .PHONY: publish
 publish: format
-	func azure functionapp publish registerangryhippo
+	func azure functionapp publish ${azurefunction}
 
 .PHONY: deploy
 deploy:
@@ -39,4 +44,12 @@ zip:
 
 .PHONY: docker-build
 docker-build:
-	docker build --rm --pull  --file "Dockerfile"  --tag "registerappliances:latest"  .
+	docker build --tag ${dockerid}/${dockerimage}:${dockerversion} .
+
+.PHONY: docker-push
+docker-push:
+	docker push ${dockerid}/${dockerimage}:${dockerversion}
+
+.PHONY: update-deployment
+update-deployment:
+	az functionapp config container set --image ${dockerid}/${dockerimage}:${dockerversion} --registry-password something-very-secret --registry-username ${dockerid} --name ${azurefunction} --resource-group ${resourcegroup}

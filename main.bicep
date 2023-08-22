@@ -1153,3 +1153,37 @@ resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-09-01' = {
     virtualNetworkSubnetId: functionssubnet.id
   }
 }
+
+
+
+// resource registerangryhippo 'Microsoft.Web/sites@2022-09-01' = {
+//   name: 'registerangryhippo'
+//   kind: 'functionapp,linux,container,azurecontainerapps'
+//   location: location
+//   tags: {
+//     owner: 'mbright@cpacketnetworks.com'
+//   }
+//   properties: {
+//     name: 'registerangryhippo'
+//     webSpace: '0662461ce70640722377d2be853db329b386b2dbb32731d444c39e88fbde1120'
+//     contentAvailabilityState: 'Normal'
+//     runtimeAvailabilityState: 'Normal'
+//     siteConfig: {
+//       linuxFxVersion: 'DOCKER|docker.io/mbrightcpacket/registerappliances:0.0.1'
+//       functionAppScaleLimit: 30
+//       minimumElasticInstanceCount: 0
+//     }
+//     deploymentId: 'registerangryhippo'
+//     kind: 'functionapp,linux,container,azurecontainerapps'
+//     managedEnvironmentId: '/subscriptions/93004638-8c6b-4e33-ba58-946afd57efdf/resourceGroups/mbright-bicep-test/providers/Microsoft.App/managedEnvironments/managedEnvironment-mbrightbiceptest-a38b'
+//     tags: {
+//       owner: 'mbright@cpacketnetworks.com'
+//     }
+//     privateEndpointConnections: []
+//     storageAccountRequired: false
+//   }
+//   identity: {
+//     type: 'None'
+//   }
+// }
+// 
