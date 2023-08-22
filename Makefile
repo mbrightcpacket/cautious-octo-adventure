@@ -36,3 +36,7 @@ package:
 .PHONY: zip
 zip:
 	zip -r function_app.zip function_app.py host.json requirements.txt
+
+.PHONY: docker-build
+docker-build:
+	docker build --rm --pull  --file "Dockerfile"  --tag "registerappliances:latest"  .
