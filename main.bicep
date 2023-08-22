@@ -24,6 +24,36 @@
 //
 // where $parameters is a JSON file containing the parameters to pass in
 
+// adding for compatibility
+
+param subscriptionId string
+param tenantId string
+param ResourceGroup string
+param cstorvVmImageLocation string
+param cstorvVmImangeName string
+param cvuvVmImageLocation string
+param cvuvVmImageName string
+param dsTool1 string
+param dsTool2 string
+param dsTool3 string
+param dsTool4 string
+param dsTool5 string
+param dsTool6 string
+param dsTool7 string
+param dsTool8 string
+param dsTool9 string
+param dsTool10 string
+param TESTexistingVM string
+param TESTexistingNIC string
+param cclearvVmImageLocation string
+param cclearvVmImageName string
+param adminVmEnable string
+param adminVmName string
+param adminVmSize string
+param notifyEmail string
+
+///////
+
 param location string
 
 param deploymentId string
@@ -937,8 +967,12 @@ resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-03-01' = {
           value: '1'
         }
         {
+          name: 'FUNCTION_APP_EDIT_MODE'
+          value: 'readwrite'
+        }
+        {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'false'
+          value: 'true'
         }
       ]
     }
@@ -951,6 +985,9 @@ resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-03-01' = {
 }
 
 resource applianceregistration 'Microsoft.Web/sites/functions@2022-09-01' = {
+  dependsOn: [
+    registerangryhippoFunctionApp
+  ]
   parent: registerangryhippoFunctionApp
   name: 'appliance_registration'
   properties: {

@@ -5,10 +5,85 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "10192225995109505305"
+      "templateHash": "6115012145372887453"
     }
   },
   "parameters": {
+    "subscriptionId": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string"
+    },
+    "ResourceGroup": {
+      "type": "string"
+    },
+    "cstorvVmImageLocation": {
+      "type": "string"
+    },
+    "cstorvVmImangeName": {
+      "type": "string"
+    },
+    "cvuvVmImageLocation": {
+      "type": "string"
+    },
+    "cvuvVmImageName": {
+      "type": "string"
+    },
+    "dsTool1": {
+      "type": "string"
+    },
+    "dsTool2": {
+      "type": "string"
+    },
+    "dsTool3": {
+      "type": "string"
+    },
+    "dsTool4": {
+      "type": "string"
+    },
+    "dsTool5": {
+      "type": "string"
+    },
+    "dsTool6": {
+      "type": "string"
+    },
+    "dsTool7": {
+      "type": "string"
+    },
+    "dsTool8": {
+      "type": "string"
+    },
+    "dsTool9": {
+      "type": "string"
+    },
+    "dsTool10": {
+      "type": "string"
+    },
+    "TESTexistingVM": {
+      "type": "string"
+    },
+    "TESTexistingNIC": {
+      "type": "string"
+    },
+    "cclearvVmImageLocation": {
+      "type": "string"
+    },
+    "cclearvVmImageName": {
+      "type": "string"
+    },
+    "adminVmEnable": {
+      "type": "string"
+    },
+    "adminVmName": {
+      "type": "string"
+    },
+    "adminVmSize": {
+      "type": "string"
+    },
+    "notifyEmail": {
+      "type": "string"
+    },
     "location": {
       "type": "string"
     },
@@ -714,8 +789,12 @@
               "value": "1"
             },
             {
+              "name": "FUNCTION_APP_EDIT_MODE",
+              "value": "readwrite"
+            },
+            {
               "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
-              "value": "false"
+              "value": "true"
             }
           ]
         },
