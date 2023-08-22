@@ -18,7 +18,9 @@ To create the [Azure button][azure-button], you need to run the `azure-button.py
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Ftest1%2Fmain.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Ftest1%2FcreateUIDefinition.json)
 ```
 
-Clicking the button above will take you to the Azure portal and start the custom deployment process, as illustrated below:
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Ftest1%2Fmain.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Ftest1%2FcreateUIDefinition.json)
+
+Clicking the button above will take you to the Azure portal and start the custom deployment process with the version tagged `test1`, as illustrated below:
 
 ![custom deployment](deployment.png "Custom Deployment")
 
