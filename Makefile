@@ -41,7 +41,7 @@ package:
 
 .PHONY: zip
 zip:
-	zip -r function_app.zip function_app.py host.json requirements.txt
+	zip -r function_app.zip function_app.py host.json requirements.txt .venv
 
 .PHONY: docker-build
 docker-build:

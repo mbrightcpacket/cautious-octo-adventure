@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "6483354717594839943"
+      "templateHash": "10192225995109505305"
     }
   },
   "parameters": {
@@ -78,7 +78,7 @@
     },
     "packageUri": {
       "type": "string",
-      "defaultValue": "https://github.com/mbrightcpacket/cautious-octo-adventure/releases/download/deploying-minus-function/function_app.zip"
+      "defaultValue": "https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/function_app.zip"
     },
     "tags": {
       "type": "object"
@@ -688,6 +688,7 @@
           "alwaysOn": false,
           "functionAppScaleLimit": 0,
           "http20Enabled": true,
+          "linuxFxVersion": "Python|3.10",
           "minimumElasticInstanceCount": 1,
           "numberOfWorkers": 1,
           "pythonVersion": "3.10",

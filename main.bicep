@@ -50,7 +50,7 @@ param cvuvVmImageId string
 param vmssMin int
 param vmssMax int
 
-param packageUri string = 'https://github.com/mbrightcpacket/cautious-octo-adventure/releases/download/deploying-minus-function/function_app.zip'
+param packageUri string = 'https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/function_app.zip'
 
 // cvuv downstream tool IPs - must go into generated user-data
 // param dsTool1 string
@@ -911,7 +911,7 @@ resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-03-01' = {
       alwaysOn: false
       functionAppScaleLimit: 0
       http20Enabled: true
-      // linuxFxVersion: 'Python|3.10'
+      linuxFxVersion: 'Python|3.10'
       minimumElasticInstanceCount: 1
       numberOfWorkers: 1
       pythonVersion: '3.10'
