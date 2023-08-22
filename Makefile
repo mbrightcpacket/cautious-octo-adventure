@@ -16,7 +16,8 @@ build: format
 format:
 	az bicep format --file main.bicep
 	find . -type f -name "*.sh" -exec shfmt --diff --case-indent --indent 2 -w {} \;
-	find . -type f -name "*.py" -exec black {} \;
+	# fd -t f "*.py" -x black {} \;
+	black function_app.py
 
 .PHONY: json
 json:
