@@ -26,7 +26,7 @@ Clicking the button above will take you to the Azure portal and start the custom
 
 ### Editing the browser UI
 
-There is a [browser based interface][ui-definition] to edit the UI.
+There is also a [browser based interface][ui-definition] to edit the UI definition that defines the above flow.
 
 [azure-button]: https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-to-azure-button
 [ui-definition]: https://portal.azure.com/?feature.customPortal=false#view/Microsoft_Azure_CreateUIDef/SandboxBlade]
