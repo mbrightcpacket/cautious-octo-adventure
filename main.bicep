@@ -893,6 +893,9 @@ resource vmssevents 'Microsoft.EventGrid/systemTopics@2022-06-15' = {
 
 // Function App (not to be confused with function)
 resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-03-01' = {
+  dependsOn: [
+    functionssubnet
+  ]
   name: 'registerangryhippo'
   location: location
   // tags: {}
