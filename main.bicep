@@ -26,31 +26,31 @@
 
 // adding for compatibility
 
-param subscriptionId string
-param tenantId string
-param ResourceGroup string
-param cstorvVmImageLocation string
-param cstorvVmImangeName string
-param cvuvVmImageLocation string
-param cvuvVmImageName string
-param dsTool1 string
-param dsTool2 string
-param dsTool3 string
-param dsTool4 string
-param dsTool5 string
-param dsTool6 string
-param dsTool7 string
-param dsTool8 string
-param dsTool9 string
-param dsTool10 string
-param TESTexistingVM string
-param TESTexistingNIC string
-param cclearvVmImageLocation string
-param cclearvVmImageName string
-param adminVmEnable string
-param adminVmName string
-param adminVmSize string
-param notifyEmail string
+// param subscriptionId string
+// param tenantId string
+// param ResourceGroup string
+// param cstorvVmImageLocation string
+// param cstorvVmImangeName string
+// param cvuvVmImageLocation string
+// param cvuvVmImageName string
+// param dsTool1 string
+// param dsTool2 string
+// param dsTool3 string
+// param dsTool4 string
+// param dsTool5 string
+// param dsTool6 string
+// param dsTool7 string
+// param dsTool8 string
+// param dsTool9 string
+// param dsTool10 string
+// param TESTexistingVM string
+// param TESTexistingNIC string
+// param cclearvVmImageLocation string
+// param cclearvVmImageName string
+// param adminVmEnable string
+// param adminVmName string
+// param adminVmSize string
+// param notifyEmail string
 
 ///////
 
