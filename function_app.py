@@ -14,6 +14,7 @@ import azure.mgmt.network
 import typing
 
 key_vault_name = "cpacket"
+appliance_username = "cpacket"
 
 app = func.FunctionApp()
 
@@ -411,17 +412,17 @@ def get_cpacket_credentials() -> typing.Tuple[str, str]:
     secrets_client = azure.keyvault.secrets.SecretClient(
         vault_url=key_vault_uri, credential=credentials
     )
-    retrieved_secret = secrets_client.get_secret("cvuv")
+    retrieved_secret = secrets_client.get_secret(appliance_username)
     if retrieved_secret is None:
-        logging.error(f"failed to get secret 'cvuv'")
+        logging.error(f"failed to get secret '{appliance_username}'")
         return ("", "")
 
-    secret_value = retrieved_secret.value
-    if secret_value is None:
+    password = retrieved_secret.value
+    if password is None:
         logging.error(f"failed to get secret value for 'cvuv'")
         return ("", "")
-    user, password = secret_value.split(":")
-    return (user, password)
+
+    return (appliance_username, password)
 
 
 def test_http(url: str) -> typing.Optional[str]:
