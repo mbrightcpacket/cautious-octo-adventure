@@ -967,7 +967,7 @@ resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-03-01' = {
         }
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1'
+          value: '0'
         }
         {
           name: 'FUNCTION_APP_EDIT_MODE'
