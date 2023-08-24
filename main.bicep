@@ -118,34 +118,50 @@ var linuxConfiguration = {
   }
 }
 
-// var cvuv_cloud_init_header = '''
-// #!/bin/bash
-// set -ex
+var cvuv_cloud_init_template = '''
+#!/bin/bash
+set -ex
 
-// boot_config_file="/home/cpacket/boot_config.toml"
-// capture_nic_ip="$(ip addr show eth0 | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)"
-// capture_nic="eth0"
+echo "set -o vi" >>/home/ubuntu/.bashrc
+echo "set -o vi" >>/root/.bashrc
 
-// touch "$boot_config_file"
-// chmod a+w "$boot_config_file"
-// cat >"$boot_config_file"  <<BOOTCONFIG
-// vm_type = "azure"
-// cvuv_mode = "inline"
-// cvuv_mirror_eth_0 = "$capture_nic"
+bootconfig_file="/home/cpacket/boot_config.toml"
 
-// '''
+# Comma-separated list of IPV4 addresses
+downstream_tools="DOWNSTREAM_CAPTURE_IPS"
 
-// var cvuv_cloud_init_footer = '''
-// BOOTCONFIG
-// '''
+# Convert the comma-separated list into an array
+IFS=',' read -r -a downstream_tool_addresses <<<"$(echo "$downstream_tools" | tr -d '[:space:]')"
 
-// var cvuv_cloud_init_body = '''
-// cvuv_vxlan_id_0 = 1337
-// cvuv_vxlan_srcip_0 = "$capture_nic_ip"
-// cvuv_vxlan_remoteip_0 = "REPLACE_WITH_REMOTE_IP"
-// '''
+capture_nic="eth0"
+capture_nic_ip=$(ip a show dev "$capture_nic" | awk -F'[ /]' '/inet /{print $6}')
 
-// var cvuv_cloud_init = '${cvuv_cloud_init_header}${replace(cvuv_cloud_init_body, 'REPLACE_WITH_REMOTE_IP', cVu3rdPartyToolIPs)}${cvuv_cloud_init_footer}'
+touch "$bootconfig_file"
+chmod a+w "$bootconfig_file"
+
+cat >"$bootconfig_file" <<BOOTCFG_HEADER
+vm_type = "azure"
+cvuv_mode = "inline"
+cvuv_mirror_eth_0 = "$capture_nic"
+BOOTCFG_HEADER
+
+for tools_index in "${!downstream_tool_addresses[@]}"; do
+  name_index=$((tools_index))
+  leet_index=$((tools_index + 1337))
+  cat >>"$bootconfig_file" <<ADDITIONAL_TOOLS
+cvuv_vxlan_id_${name_index} = ${leet_index}
+cvuv_vxlan_srcip_${name_index} = "$capture_nic_ip"
+cvuv_vxlan_remoteip_${name_index} = "${downstream_tool_addresses[$tools_index]}"
+ADDITIONAL_TOOLS
+done
+
+# cat >>"$bootconfig_file" <<FOOTER
+# FOOTER
+
+echo "boot configuration: completed"
+'''
+
+var cvuv_cloud_init = replace(cvuv_cloud_init_template, 'DOWNSTREAM_CAPTURE_IPS', downstreamTools)
 
 // Variables - end
 //////////////////////////////////////////////////////////////////////////////
@@ -399,8 +415,7 @@ resource cstorvm 'Microsoft.Compute/virtualMachines@2021-03-01' = if (cstorvEnab
       adminUsername: adminUser
       adminPassword: sshPublicKey
       linuxConfiguration: linuxConfiguration
-      // TODO: user-data generated from bicep vars etc...
-      // customData: loadFileAsBase64('./userdata-cstor.bash')
+      customData: base64(cvuv_cloud_init)
     }
   }
   tags: contains(tags, 'Microsoft.Compute/virtualMachines') ? tags['Microsoft.Compute/virtualMachines'] : null
@@ -855,42 +870,42 @@ resource managementSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-0
 
 // Service plan
 
-resource hostplan 'Microsoft.Web/serverfarms@2022-09-01' = {
-  name: 'registerangryhippo'
-  kind: 'elastic'
-  location: location
-  properties: {
-    // serverFarmId: 14883
-    // name: 'registerangryhippo'
-    // workerSize: 'D1'
-    // workerSizeId: 3
-    // currentWorkerSize: 'D1'
-    // currentWorkerSizeId: 3
-    // currentNumberOfWorkers: 1
-    // webSpace: 'mbright-bicep-test-EastUS2webspace-Linux'
-    // planName: 'VirtualDedicatedPlan'
-    // computeMode: 'Dynamic' // or 'Dedicated'?
-    perSiteScaling: false
-    elasticScaleEnabled: true
-    maximumElasticWorkerCount: 1
-    isSpot: false
-    // kind: 'elastic'
-    reserved: true
-    isXenon: false
-    hyperV: false
-    // mdmId: 'waws-prod-bn1-205_14883'
-    targetWorkerCount: 0
-    targetWorkerSizeId: 0
-    zoneRedundant: false
-  }
-  sku: {
-    name: 'EP1'
-    tier: 'ElasticPremium'
-    size: 'EP1'
-    family: 'EP'
-    capacity: 1
-  }
-}
+// resource hostplan 'Microsoft.Web/serverfarms@2022-09-01' = {
+//   name: 'registerangryhippo'
+//   kind: 'elastic'
+//   location: location
+//   properties: {
+//     // serverFarmId: 14883
+//     // name: 'registerangryhippo'
+//     // workerSize: 'D1'
+//     // workerSizeId: 3
+//     // currentWorkerSize: 'D1'
+//     // currentWorkerSizeId: 3
+//     // currentNumberOfWorkers: 1
+//     // webSpace: 'mbright-bicep-test-EastUS2webspace-Linux'
+//     // planName: 'VirtualDedicatedPlan'
+//     // computeMode: 'Dynamic' // or 'Dedicated'?
+//     perSiteScaling: false
+//     elasticScaleEnabled: true
+//     maximumElasticWorkerCount: 1
+//     isSpot: false
+//     // kind: 'elastic'
+//     reserved: true
+//     isXenon: false
+//     hyperV: false
+//     // mdmId: 'waws-prod-bn1-205_14883'
+//     targetWorkerCount: 0
+//     targetWorkerSizeId: 0
+//     zoneRedundant: false
+//   }
+//   sku: {
+//     name: 'EP1'
+//     tier: 'ElasticPremium'
+//     size: 'EP1'
+//     family: 'EP'
+//     capacity: 1
+//   }
+// }
 
 // Storage account
 

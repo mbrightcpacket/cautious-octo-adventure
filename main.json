@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "15017448414683464083"
+      "templateHash": "8034910623496631480"
     }
   },
   "parameters": {
@@ -112,7 +112,9 @@
           }
         ]
       }
-    }
+    },
+    "cvuv_cloud_init_template": "#!/bin/bash\nset -ex\n\necho \"set -o vi\" >>/home/ubuntu/.bashrc\necho \"set -o vi\" >>/root/.bashrc\n\nbootconfig_file=\"/home/cpacket/boot_config.toml\"\n\n# Comma-separated list of IPV4 addresses\ndownstream_tools=\"DOWNSTREAM_CAPTURE_IPS\"\n\n# Convert the comma-separated list into an array\nIFS=',' read -r -a downstream_tool_addresses <<<\"$(echo \"$downstream_tools\" | tr -d '[:space:]')\"\n\ncapture_nic=\"eth0\"\ncapture_nic_ip=$(ip a show dev \"$capture_nic\" | awk -F'[ /]' '/inet /{print $6}')\n\ntouch \"$bootconfig_file\"\nchmod a+w \"$bootconfig_file\"\n\ncat >\"$bootconfig_file\" <<BOOTCFG_HEADER\nvm_type = \"azure\"\ncvuv_mode = \"inline\"\ncvuv_mirror_eth_0 = \"$capture_nic\"\nBOOTCFG_HEADER\n\nfor tools_index in \"${!downstream_tool_addresses[@]}\"; do\n  name_index=$((tools_index))\n  leet_index=$((tools_index + 1337))\n  cat >>\"$bootconfig_file\" <<ADDITIONAL_TOOLS\ncvuv_vxlan_id_${name_index} = ${leet_index}\ncvuv_vxlan_srcip_${name_index} = \"$capture_nic_ip\"\ncvuv_vxlan_remoteip_${name_index} = \"${downstream_tool_addresses[$tools_index]}\"\nADDITIONAL_TOOLS\ndone\n\n# cat >>\"$bootconfig_file\" <<FOOTER\n# FOOTER\n\necho \"boot configuration: completed\"\n",
+    "cvuv_cloud_init": "[replace(variables('cvuv_cloud_init_template'), 'DOWNSTREAM_CAPTURE_IPS', parameters('downstreamTools'))]"
   },
   "resources": [
     {
@@ -302,7 +304,8 @@
           "computerName": "[parameters('cstorvName')]",
           "adminUsername": "[parameters('adminUser')]",
           "adminPassword": "[parameters('sshPublicKey')]",
-          "linuxConfiguration": "[variables('linuxConfiguration')]"
+          "linuxConfiguration": "[variables('linuxConfiguration')]",
+          "customData": "[base64(variables('cvuv_cloud_init'))]"
         }
       },
       "tags": "[if(contains(parameters('tags'), 'Microsoft.Compute/virtualMachines'), parameters('tags')['Microsoft.Compute/virtualMachines'], null())]",
@@ -565,32 +568,6 @@
             }
           }
         ]
-      }
-    },
-    {
-      "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2022-09-01",
-      "name": "registerangryhippo",
-      "kind": "elastic",
-      "location": "[parameters('location')]",
-      "properties": {
-        "perSiteScaling": false,
-        "elasticScaleEnabled": true,
-        "maximumElasticWorkerCount": 1,
-        "isSpot": false,
-        "reserved": true,
-        "isXenon": false,
-        "hyperV": false,
-        "targetWorkerCount": 0,
-        "targetWorkerSizeId": 0,
-        "zoneRedundant": false
-      },
-      "sku": {
-        "name": "EP1",
-        "tier": "ElasticPremium",
-        "size": "EP1",
-        "family": "EP",
-        "capacity": 1
       }
     },
     {
