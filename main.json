@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "2147232821938199926"
+      "templateHash": "12562113041750407874"
     }
   },
   "parameters": {
@@ -76,12 +76,93 @@
     "vmssMax": {
       "type": "int"
     },
-    "packageUri": {
-      "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/function_app.zip"
-    },
     "tags": {
       "type": "object"
+    },
+    "keyVaultName": {
+      "type": "string",
+      "defaultValue": "ccloud",
+      "metadata": {
+        "description": "Specifies the name of the key vault."
+      }
+    },
+    "enabledForDeployment": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault."
+      }
+    },
+    "enabledForDiskEncryption": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys."
+      }
+    },
+    "enabledForTemplateDeployment": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies whether Azure Resource Manager is permitted to retrieve secrets from the key vault."
+      }
+    },
+    "tenantId": {
+      "type": "string",
+      "defaultValue": "[subscription().tenantId]",
+      "metadata": {
+        "description": "Specifies the Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. Get it by using Get-AzSubscription cmdlet."
+      }
+    },
+    "objectId": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies. Get it by using Get-AzADUser or Get-AzADServicePrincipal cmdlets."
+      }
+    },
+    "keysPermissions": {
+      "type": "array",
+      "defaultValue": [
+        "list"
+      ],
+      "metadata": {
+        "description": "Specifies the permissions to keys in the vault. Valid values are: all, encrypt, decrypt, wrapKey, unwrapKey, sign, verify, get, list, create, update, import, delete, backup, restore, recover, and purge."
+      }
+    },
+    "secretsPermissions": {
+      "type": "array",
+      "defaultValue": [
+        "list",
+        "get",
+        "set"
+      ],
+      "metadata": {
+        "description": "Specifies the permissions to secrets in the vault. Valid values are: all, get, list, set, delete, backup, restore, recover, and purge."
+      }
+    },
+    "skuName": {
+      "type": "string",
+      "defaultValue": "standard",
+      "allowedValues": [
+        "standard",
+        "premium"
+      ],
+      "metadata": {
+        "description": "Specifies whether the key vault is a standard vault or a premium vault."
+      }
+    },
+    "secretName": {
+      "type": "string",
+      "defaultValue": "cpacket",
+      "metadata": {
+        "description": "Specifies the name of the secret that you want to create."
+      }
+    },
+    "secretValue": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Specifies the value of the secret that you want to create."
+      }
     }
   },
   "variables": {
@@ -566,6 +647,62 @@
       }
     },
     {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2023-02-01",
+      "name": "cpacket",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "family": "A",
+          "name": "standard"
+        },
+        "tenantId": "[tenant().tenantId]"
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2021-11-01-preview",
+      "name": "[parameters('keyVaultName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "enabledForDeployment": "[parameters('enabledForDeployment')]",
+        "enabledForDiskEncryption": "[parameters('enabledForDiskEncryption')]",
+        "enabledForTemplateDeployment": "[parameters('enabledForTemplateDeployment')]",
+        "tenantId": "[parameters('tenantId')]",
+        "enableSoftDelete": true,
+        "softDeleteRetentionInDays": 1,
+        "accessPolicies": [
+          {
+            "objectId": "[parameters('objectId')]",
+            "tenantId": "[parameters('tenantId')]",
+            "permissions": {
+              "keys": "[parameters('keysPermissions')]",
+              "secrets": "[parameters('secretsPermissions')]"
+            }
+          }
+        ],
+        "sku": {
+          "name": "[parameters('skuName')]",
+          "family": "A"
+        },
+        "networkAcls": {
+          "defaultAction": "Allow",
+          "bypass": "AzureServices"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2021-11-01-preview",
+      "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('secretName'))]",
+      "properties": {
+        "value": "[parameters('secretValue')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+      ]
+    },
+    {
       "type": "Microsoft.Web/serverfarms",
       "apiVersion": "2022-09-01",
       "name": "registerangryhippo",
@@ -658,122 +795,13 @@
       "tags": {}
     },
     {
-      "type": "Microsoft.Web/sites",
-      "apiVersion": "2022-03-01",
-      "name": "registerangryhippo",
-      "location": "[parameters('location')]",
-      "kind": "functionapp,linux",
-      "identity": {
-        "type": "SystemAssigned"
-      },
-      "properties": {
-        "clientAffinityEnabled": false,
-        "clientCertEnabled": false,
-        "clientCertMode": "Required",
-        "containerSize": 0,
-        "dailyMemoryTimeQuota": 0,
-        "enabled": true,
-        "hostNamesDisabled": false,
-        "httpsOnly": false,
-        "hyperV": false,
-        "isXenon": false,
-        "keyVaultReferenceIdentity": "SystemAssigned",
-        "publicNetworkAccess": "Disabled",
-        "redundancyMode": "None",
-        "reserved": true,
-        "scmSiteAlsoStopped": false,
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', 'registerangryhippo')]",
-        "siteConfig": {
-          "acrUseManagedIdentityCreds": false,
-          "alwaysOn": false,
-          "functionAppScaleLimit": 0,
-          "http20Enabled": true,
-          "linuxFxVersion": "Python|3.10",
-          "minimumElasticInstanceCount": 1,
-          "numberOfWorkers": 1,
-          "pythonVersion": "3.10",
-          "appSettings": [
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "[reference(resourceId('Microsoft.Insights/components', 'registerangryhippo'), '2020-02-02').InstrumentationKey]"
-            },
-            {
-              "name": "AzureWebJobsStorage",
-              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', 'registerangryhippo', environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', 'registerangryhippo'), '2022-09-01').keys[0].value)]"
-            },
-            {
-              "name": "FUNCTIONS_EXTENSION_VERSION",
-              "value": "~4"
-            },
-            {
-              "name": "FUNCTIONS_WORKER_RUNTIME",
-              "value": "python"
-            },
-            {
-              "name": "WEBSITE_RUN_FROM_PACKAGE",
-              "value": "0"
-            },
-            {
-              "name": "FUNCTION_APP_EDIT_MODE",
-              "value": "readwrite"
-            },
-            {
-              "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
-              "value": "true"
-            }
-          ]
-        },
-        "storageAccountRequired": false,
-        "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.functionsSubnet.name)]",
-        "vnetContentShareEnabled": false,
-        "vnetImagePullEnabled": false,
-        "vnetRouteAllEnabled": false
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetwork').name, parameters('virtualNetwork').subnets.functionsSubnet.name)]",
-        "[resourceId('Microsoft.Web/serverfarms', 'registerangryhippo')]",
-        "[resourceId('Microsoft.Insights/components', 'registerangryhippo')]",
-        "[resourceId('Microsoft.Storage/storageAccounts', 'registerangryhippo')]"
-      ]
-    },
-    {
-      "type": "Microsoft.Web/sites/functions",
-      "apiVersion": "2022-09-01",
-      "name": "[format('{0}/{1}', 'registerangryhippo', 'appliance_registration')]",
-      "properties": {
-        "script_href": "https://registerangryhippo.azurewebsites.net/admin/vfs/home/site/wwwroot/function_app.py",
-        "test_data_href": "https://registerangryhippo.azurewebsites.net/admin/vfs/home/data/Functions/sampledata/appliance_registration.dat",
-        "href": "https://registerangryhippo.azurewebsites.net/admin/functions/appliance_registration",
-        "config": {
-          "name": "appliance_registration",
-          "entryPoint": "appliance_registration",
-          "scriptFile": "function_app.py",
-          "language": "python",
-          "functionDirectory": "/home/site/wwwroot",
-          "bindings": [
-            {
-              "direction": "IN",
-              "type": "eventGridTrigger",
-              "name": "event"
-            }
-          ]
-        },
-        "test_data": "",
-        "language": "python",
-        "isDisabled": false
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', 'registerangryhippo')]"
-      ]
-    },
-    {
       "type": "Microsoft.EventGrid/eventSubscriptions",
       "apiVersion": "2023-06-01-preview",
-      "name": "rgevents",
+      "name": "scaling",
       "properties": {
         "destination": {
           "properties": {
-            "resourceId": "[resourceId('Microsoft.Web/sites/functions', 'registerangryhippo', 'appliance_registration')]",
+            "resourceId": "[resourceId('Microsoft.Web/sites/functions', 'registerangryhippo', 'applianceregistration')]",
             "maxEventsPerBatch": 1,
             "preferredBatchSizeInKilobytes": 64
           },
@@ -795,7 +823,9 @@
           ],
           "enableAdvancedFilteringOnArrays": true
         },
-        "labels": [],
+        "labels": [
+          "functions-applianceregistration"
+        ],
         "eventDeliverySchema": "EventGridSchema",
         "retryPolicy": {
           "maxDeliveryAttempts": 30,
@@ -803,20 +833,61 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/functions', 'registerangryhippo', 'appliance_registration')]",
-        "[resourceId('Microsoft.EventGrid/systemTopics', 'vmss-events')]"
+        "[resourceId('Microsoft.Web/sites/functions', 'registerangryhippo', 'applianceregistration')]"
       ]
     },
     {
-      "type": "Microsoft.Web/sites/extensions",
-      "apiVersion": "2021-02-01",
-      "name": "[format('{0}/{1}', 'registerangryhippo', 'MSDeploy')]",
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-09-01",
+      "name": "registerangryhippo",
+      "kind": "functionapp,linux,container,azurecontainerapps",
+      "location": "[parameters('location')]",
       "properties": {
-        "packageUri": "[parameters('packageUri')]"
+        "siteConfig": {
+          "linuxFxVersion": "DOCKER|mbrightcpacket/registerappliances:0.0.2",
+          "functionAppScaleLimit": 30,
+          "minimumElasticInstanceCount": 0
+        },
+        "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', 'registerangryhippo')]",
+        "storageAccountRequired": false
+      },
+      "identity": {
+        "type": "None"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', 'registerangryhippo')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/sites/functions",
+      "apiVersion": "2022-09-01",
+      "name": "[format('{0}/{1}', 'registerangryhippo', 'applianceregistration')]",
+      "properties": {
+        "config": {
+          "scriptFile": "__init__.py",
+          "bindings": [
+            {
+              "type": "eventGridTrigger",
+              "name": "event",
+              "direction": "in"
+            }
+          ]
+        },
+        "language": "python",
+        "isDisabled": false
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', 'registerangryhippo')]"
       ]
+    },
+    {
+      "type": "Microsoft.App/managedEnvironments",
+      "apiVersion": "2023-05-01",
+      "name": "registerangryhippo",
+      "location": "[parameters('location')]",
+      "properties": {
+        "zoneRedundant": false
+      }
     }
   ]
 }

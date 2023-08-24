@@ -1,7 +1,7 @@
 default := all
 dockerid := mbrightcpacket
 dockerimage := registerappliances
-dockerversion := 0.0.1
+dockerversion := 0.0.2
 azurefunction := registerangryhippo
 resourcegroup := mbright-bicep-test
 
@@ -16,8 +16,8 @@ build: format
 format:
 	az bicep format --file main.bicep
 	find . -type f -name "*.sh" -exec shfmt --diff --case-indent --indent 2 -w {} \;
-	# fd -t f "*.py" -x black {} \;
-	black function_app.py
+	find . -type f -name "*.py" -maxdepth 1 -exec black {} \;
+	cd functionapp && find . -type f -name "*.py" -maxdepth 1 -exec black {} \;
 
 .PHONY: json
 json:

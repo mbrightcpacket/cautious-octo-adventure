@@ -24,3 +24,6 @@ echo "function app ID: $app_id"
 
 function_id="$(az functionapp function list -g "$resource_group" -n "$app" --query '[0].id' --output tsv)"
 echo "function ID: $function_id"
+
+container_app_id="$(az containerapp env list -g "$resource_group" --query '[0].id' -o tsv)"
+echo "container app ID: $container_app_id"

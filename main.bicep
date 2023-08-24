@@ -80,8 +80,6 @@ param cvuvVmImageId string
 param vmssMin int
 param vmssMax int
 
-param packageUri string = 'https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/function_app.zip'
-
 // cvuv downstream tool IPs - must go into generated user-data
 // param dsTool1 string
 // param dsTool2 string
@@ -778,7 +776,115 @@ resource managementSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-0
   }
 }
 
+resource cpacketKeyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
+  name: 'cpacket'
+  location: location
+  // tags: {}
+  properties: {
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
+    tenantId: tenant().tenantId
+    // accessPolicies: []
+    // enabledForDeployment: false
+    // enabledForDiskEncryption: false
+    // enabledForTemplateDeployment: false
+    // enableSoftDelete: true
+    // softDeleteRetentionInDays: 90
+    // enableRbacAuthorization: true
+    // vaultUri: 'https://cpacket2.vault.azure.net/'
+    // provisioningState: 'Succeeded'
+    // publicNetworkAccess: 'Enabled'
+  }
+}
+
 // Above this is working, below this needs tweaking
+
+// Key vault
+
+@description('Specifies the name of the key vault.')
+param keyVaultName string = 'ccloud'
+
+@description('Specifies whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault.')
+param enabledForDeployment bool = false
+
+@description('Specifies whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys.')
+param enabledForDiskEncryption bool = false
+
+@description('Specifies whether Azure Resource Manager is permitted to retrieve secrets from the key vault.')
+param enabledForTemplateDeployment bool = false
+
+@description('Specifies the Azure Active Directory tenant ID that should be used for authenticating requests to the key vault. Get it by using Get-AzSubscription cmdlet.')
+param tenantId string = subscription().tenantId
+
+@description('Specifies the object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies. Get it by using Get-AzADUser or Get-AzADServicePrincipal cmdlets.')
+param objectId string
+
+@description('Specifies the permissions to keys in the vault. Valid values are: all, encrypt, decrypt, wrapKey, unwrapKey, sign, verify, get, list, create, update, import, delete, backup, restore, recover, and purge.')
+param keysPermissions array = [
+  'list'
+]
+
+@description('Specifies the permissions to secrets in the vault. Valid values are: all, get, list, set, delete, backup, restore, recover, and purge.')
+param secretsPermissions array = [
+  'list'
+  'get'
+  'set'
+]
+
+@description('Specifies whether the key vault is a standard vault or a premium vault.')
+@allowed([
+  'standard'
+  'premium'
+])
+param skuName string = 'standard'
+
+@description('Specifies the name of the secret that you want to create.')
+param secretName string = 'cpacket'
+
+@description('Specifies the value of the secret that you want to create.')
+@secure()
+param secretValue string
+
+resource kv 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
+  name: keyVaultName
+  location: location
+  properties: {
+    enabledForDeployment: enabledForDeployment
+    enabledForDiskEncryption: enabledForDiskEncryption
+    enabledForTemplateDeployment: enabledForTemplateDeployment
+    tenantId: tenantId
+    enableSoftDelete: true
+    softDeleteRetentionInDays: 1
+    accessPolicies: [
+      {
+        objectId: objectId
+        tenantId: tenantId
+        permissions: {
+          keys: keysPermissions
+          secrets: secretsPermissions
+        }
+      }
+    ]
+    sku: {
+      name: skuName
+      family: 'A'
+    }
+    networkAcls: {
+      defaultAction: 'Allow'
+      bypass: 'AzureServices'
+    }
+  }
+}
+
+resource secret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
+  parent: kv
+  name: secretName
+  properties: {
+    value: secretValue
+  }
+}
 
 // Service plan
 
@@ -891,135 +997,7 @@ resource vmssevents 'Microsoft.EventGrid/systemTopics@2022-06-15' = {
   name: 'vmss-events'
 }
 
-// Function App (not to be confused with function)
-resource registerangryhippoFunctionApp 'Microsoft.Web/sites@2022-03-01' = {
-  dependsOn: [
-    functionssubnet
-  ]
-  name: 'registerangryhippo'
-  location: location
-  // tags: {}
-  kind: 'functionapp,linux'
-  // extendedLocation: 
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    clientAffinityEnabled: false
-    clientCertEnabled: false
-    // clientCertExclusionPaths: 'string'
-    clientCertMode: 'Required'
-    // cloningInfo: {}
-    containerSize: 0
-    // customDomainVerificationId: 'E9894CA4C1882ED2CD721B3E6BED48800A7C9E248560A3D805E49D787E2B4796'
-    dailyMemoryTimeQuota: 0
-    enabled: true
-    // hostingEnvironmentProfile: {
-    //     
-    // } 
-    hostNamesDisabled: false
-    // hostNameSslStates: [
-    //   {
-    //     name: 'registerangryhippo.azurewebsites.net'
-    //     sslState: 'Disabled'
-    //     hostType: 'Standard'
-    //   }
-    //   {
-    //     name: 'registerangryhippo.scm.azurewebsites.net'
-    //     sslState: 'Disabled'
-    //     hostType: 'Repository'
-    //   }
-    // ]
-    httpsOnly: false
-    hyperV: false
-    isXenon: false
-    keyVaultReferenceIdentity: 'SystemAssigned'
-    publicNetworkAccess: 'Disabled'
-    redundancyMode: 'None'
-    reserved: true
-    scmSiteAlsoStopped: false
-    serverFarmId: hostplan.id
-    siteConfig: {
-      acrUseManagedIdentityCreds: false
-      alwaysOn: false
-      functionAppScaleLimit: 0
-      http20Enabled: true
-      linuxFxVersion: 'Python|3.10'
-      minimumElasticInstanceCount: 1
-      numberOfWorkers: 1
-      pythonVersion: '3.10'
-      appSettings: [
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: registerangryhippoMonitoring.properties.InstrumentationKey
-        }
-        {
-          name: 'AzureWebJobsStorage'
-          value: 'DefaultEndpointsProtocol=https;AccountName=${registerangryhippoStorage.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${registerangryhippoStorage.listKeys().keys[0].value}'
-        }
-        {
-          name: 'FUNCTIONS_EXTENSION_VERSION'
-          value: '~4'
-        }
-        {
-          name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'python'
-        }
-        {
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '0'
-        }
-        {
-          name: 'FUNCTION_APP_EDIT_MODE'
-          value: 'readwrite'
-        }
-        {
-          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'true'
-        }
-      ]
-    }
-    storageAccountRequired: false
-    virtualNetworkSubnetId: functionssubnet.id
-    vnetContentShareEnabled: false
-    vnetImagePullEnabled: false
-    vnetRouteAllEnabled: false
-  }
-}
-
-resource applianceregistration 'Microsoft.Web/sites/functions@2022-09-01' = {
-  dependsOn: [
-    registerangryhippoFunctionApp
-  ]
-  parent: registerangryhippoFunctionApp
-  name: 'appliance_registration'
-  properties: {
-    script_href: 'https://registerangryhippo.azurewebsites.net/admin/vfs/home/site/wwwroot/function_app.py'
-    test_data_href: 'https://registerangryhippo.azurewebsites.net/admin/vfs/home/data/Functions/sampledata/appliance_registration.dat'
-    href: 'https://registerangryhippo.azurewebsites.net/admin/functions/appliance_registration'
-    config: {
-      name: 'appliance_registration'
-      entryPoint: 'appliance_registration'
-      scriptFile: 'function_app.py'
-      language: 'python'
-      functionDirectory: '/home/site/wwwroot'
-      bindings: [
-        {
-          direction: 'IN'
-          type: 'eventGridTrigger'
-          name: 'event'
-        }
-      ]
-    }
-    test_data: ''
-    language: 'python'
-    isDisabled: false
-  }
-}
-
-// Event Grid Subscription
-
-resource rgevents 'Microsoft.EventGrid/eventSubscriptions@2023-06-01-preview' = {
+resource scaling 'Microsoft.EventGrid/eventSubscriptions@2023-06-01-preview' = {
   properties: {
     destination: {
       properties: {
@@ -1045,58 +1023,92 @@ resource rgevents 'Microsoft.EventGrid/eventSubscriptions@2023-06-01-preview' = 
       ]
       enableAdvancedFilteringOnArrays: true
     }
-    labels: []
+    labels: [
+      'functions-applianceregistration'
+    ]
     eventDeliverySchema: 'EventGridSchema'
     retryPolicy: {
       maxDeliveryAttempts: 30
       eventTimeToLiveInMinutes: 1440
     }
   }
-  name: 'rgevents'
-  dependsOn: [
-    vmssevents
-  ]
+  name: 'scaling'
 }
 
-resource zipDeploy 'Microsoft.Web/sites/extensions@2021-02-01' = {
-  parent: registerangryhippoFunctionApp
-  name: 'MSDeploy'
+resource registerangryhippo 'Microsoft.Web/sites@2022-09-01' = {
+  name: 'registerangryhippo'
+  kind: 'functionapp,linux,container,azurecontainerapps'
+  location: location
   properties: {
-    packageUri: packageUri
+    // name: 'registerangryhippo'
+    // webSpace: '64e7982ed98384de391cfad3e94d0efd4660b324261577e2ed054464a6d968e9'
+    // contentAvailabilityState: 'Normal'
+    // runtimeAvailabilityState: 'Normal'
+    siteConfig: {
+      linuxFxVersion: 'DOCKER|mbrightcpacket/registerappliances:0.0.2'
+      functionAppScaleLimit: 30
+      minimumElasticInstanceCount: 0
+    }
+    // deploymentId: 'registerangryhippo'
+    // kind: 'functionapp,linux,container,azurecontainerapps'
+    managedEnvironmentId: registerangryhippoManagedEnv.id
+    // tags: {
+    //   'hidden-link: /app-insights-resource-id': '/subscriptions/93004638-8c6b-4e33-ba58-946afd57efdf/resourceGroups/mbright-bicep-test/providers/microsoft.insights/components/registerangryhippo'
+    //   'hidden-link: /app-insights-instrumentation-key': 'b32a8026-6079-400f-a315-d68a3b4a4aad'
+    //   'hidden-link: /app-insights-conn-string': 'InstrumentationKey=b32a8026-6079-400f-a315-d68a3b4a4aad;IngestionEndpoint=https://eastus2-4.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus2.livediagnostics.monitor.azure.com/'
+    // }
+    // privateEndpointConnections: []
+    storageAccountRequired: false
+  }
+  identity: {
+    type: 'None'
   }
 }
 
-// Resources - end
-//////////////////////////////////////////////////////////////////////////////
+resource applianceregistration 'Microsoft.Web/sites/functions@2022-09-01' = {
+  parent: registerangryhippo
+  name: 'applianceregistration'
+  properties: {
+    // name: 'applianceregistration'
+    // script_root_path_href: 'http://registerangryhippo.graybay-04fc09de.eastus2.azurecontainerapps.io/admin/vfs/home/site/wwwroot/applianceregistration/'
+    // script_href: 'http://registerangryhippo.graybay-04fc09de.eastus2.azurecontainerapps.io/admin/vfs/home/site/wwwroot/applianceregistration/__init__.py'
+    // config_href: 'http://registerangryhippo.graybay-04fc09de.eastus2.azurecontainerapps.io/admin/vfs/home/site/wwwroot/applianceregistration/function.json'
+    // test_data_href: 'http://registerangryhippo.graybay-04fc09de.eastus2.azurecontainerapps.io/admin/vfs/tmp/FunctionsData/applianceregistration.dat'
+    // href: 'http://registerangryhippo.graybay-04fc09de.eastus2.azurecontainerapps.io/admin/functions/applianceregistration'
+    config: {
+      scriptFile: '__init__.py'
+      bindings: [
+        {
+          type: 'eventGridTrigger'
+          name: 'event'
+          direction: 'in'
+        }
+      ]
+    }
+    // test_data: ''
+    language: 'python'
+    isDisabled: false
+  }
+}
 
-// resource registerangryhippo 'Microsoft.Web/sites@2022-09-01' = {
-//   name: 'registerangryhippo'
-//   kind: 'functionapp,linux,container,azurecontainerapps'
-//   location: location
-//   tags: {
-//     owner: 'mbright@cpacketnetworks.com'
-//   }
-//   properties: {
-//     name: 'registerangryhippo'
-//     webSpace: '0662461ce70640722377d2be853db329b386b2dbb32731d444c39e88fbde1120'
-//     contentAvailabilityState: 'Normal'
-//     runtimeAvailabilityState: 'Normal'
-//     siteConfig: {
-//       linuxFxVersion: 'DOCKER|docker.io/mbrightcpacket/registerappliances:0.0.1'
-//       functionAppScaleLimit: 30
-//       minimumElasticInstanceCount: 0
-//     }
-//     deploymentId: 'registerangryhippo'
-//     kind: 'functionapp,linux,container,azurecontainerapps'
-//     managedEnvironmentId: '/subscriptions/93004638-8c6b-4e33-ba58-946afd57efdf/resourceGroups/mbright-bicep-test/providers/Microsoft.App/managedEnvironments/managedEnvironment-mbrightbiceptest-a38b'
-//     tags: {
-//       owner: 'mbright@cpacketnetworks.com'
-//     }
-//     privateEndpointConnections: []
-//     storageAccountRequired: false
-//   }
-//   identity: {
-//     type: 'None'
-//   }
-// }
-// 
+resource registerangryhippoManagedEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
+  name: 'registerangryhippo'
+  location: location
+  properties: {
+    // appLogsConfiguration: {
+    //   destination: 'log-analytics'
+    //   logAnalyticsConfiguration: {
+    //     customerId: '1fbbc6d6-fc9e-4884-ba43-fe825530484b'
+    //   }
+    // }
+    zoneRedundant: false
+    // kedaConfiguration: {}
+    // daprConfiguration: {}
+    // customDomainConfiguration: {}
+    // peerAuthentication: {
+    //   mtls: {
+    //     enabled: false
+    //   }
+    // }
+  }
+}
