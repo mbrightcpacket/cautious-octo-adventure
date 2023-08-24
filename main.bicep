@@ -1019,7 +1019,7 @@ resource scaling 'Microsoft.EventGrid/eventSubscriptions@2023-06-01-preview' = {
 
 resource registerangryhippo 'Microsoft.Web/sites@2022-09-01' = {
   name: 'registerangryhippo'
-  kind: 'functionapp,linux,container,azurecontainerapps'
+  kind: 'functionapp,linux,container'
   location: location
   properties: {
     // name: 'registerangryhippo'

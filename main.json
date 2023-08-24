@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "8034910623496631480"
+      "templateHash": "13836689246649661852"
     }
   },
   "parameters": {
@@ -682,7 +682,7 @@
       "type": "Microsoft.Web/sites",
       "apiVersion": "2022-09-01",
       "name": "registerangryhippo",
-      "kind": "functionapp,linux,container,azurecontainerapps",
+      "kind": "functionapp,linux,container",
       "location": "[parameters('location')]",
       "properties": {
         "siteConfig": {
