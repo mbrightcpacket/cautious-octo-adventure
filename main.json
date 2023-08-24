@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "2449475910786070286"
+      "templateHash": "9530377464521421049"
     }
   },
   "parameters": {
@@ -75,6 +75,12 @@
     },
     "vmssMax": {
       "type": "int"
+    },
+    "downstreamTools": {
+      "type": "string"
+    },
+    "notifyEmail": {
+      "type": "string"
     },
     "tags": {
       "type": "object"

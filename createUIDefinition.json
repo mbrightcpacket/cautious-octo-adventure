@@ -355,9 +355,9 @@
                         "visible": true
                     },
                     {
-                        "name": "vmssDsTool1",
+                        "name": "vmssDsTools",
                         "type": "Microsoft.Common.TextBox",
-                        "label": "Downstream tool 1",
+                        "label": "Downstream tools",
                         "placeholder": "",
                         "defaultValue": "10.12.14.16",
                         "toolTip": "Downstream tool to send packets to (VXLAN)",
@@ -365,87 +365,6 @@
 						"constraints": {
 							"required": true
 						}
-                    },
-                    {
-                        "name": "vmssDsTool2",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Downstream tool 2",
-                        "placeholder": "",
-                        "defaultValue": "",
-                        "toolTip": "Downstream tool to send packets to (VXLAN)",
-                        "visible": true
-                    },
-                    {
-                        "name": "vmssDsTool3",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Downstream tool 3",
-                        "placeholder": "",
-                        "defaultValue": "",
-                        "toolTip": "Downstream tool to send packets to (VXLAN)",
-                        "visible": true
-                    },
-                    {
-                        "name": "vmssDsTool4",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Downstream tool 4",
-                        "placeholder": "",
-                        "defaultValue": "",
-                        "toolTip": "Downstream tool to send packets to (VXLAN)",
-                        "visible": true
-                    },
-                    {
-                        "name": "vmssDsTool5",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Downstream tool 5",
-                        "placeholder": "",
-                        "defaultValue": "",
-                        "toolTip": "Downstream tool to send packets to (VXLAN)",
-                        "visible": true
-                    },
-                    {
-                        "name": "vmssDsTool6",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Downstream tool 6",
-                        "placeholder": "",
-                        "defaultValue": "",
-                        "toolTip": "Downstream tool to send packets to (VXLAN)",
-                        "visible": true
-                    },
-                    {
-                        "name": "vmssDsTool7",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Downstream tool 7",
-                        "placeholder": "",
-                        "defaultValue": "",
-                        "toolTip": "Downstream tool to send packets to (VXLAN)",
-                        "visible": true
-                    },
-                    {
-                        "name": "vmssDsTool8",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Downstream tool 8",
-                        "placeholder": "",
-                        "defaultValue": "",
-                        "toolTip": "Downstream tool to send packets to (VXLAN)",
-                        "visible": true
-                    },
-                    {
-                        "name": "vmssDsTool9",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Downstream tool 9",
-                        "placeholder": "",
-                        "defaultValue": "",
-                        "toolTip": "Downstream tool to send packets to (VXLAN)",
-                        "visible": true
-                    },
-                    {
-                        "name": "vmssDsTool10",
-                        "type": "Microsoft.Common.TextBox",
-                        "label": "Downstream tool 10",
-                        "placeholder": "",
-                        "defaultValue": "",
-                        "toolTip": "Downstream tool to send packets to (VXLAN)",
-                        "visible": true
                     },
                     {
                         "name": "TESTexistingVM",
@@ -620,16 +539,7 @@
             "cvuvVmImageName" : "[steps('cvuvSection').cvuvVmImageSelector.name]",
             "vmssMin": "[int(steps('cvuvSection').vmssMin)]",
             "vmssMax": "[int(steps('cvuvSection').vmssMax)]",
-            "dsTool1": "[steps('cvuvSection').vmssDsTool1]",
-            "dsTool2": "[steps('cvuvSection').vmssDsTool2]",
-            "dsTool3": "[steps('cvuvSection').vmssDsTool3]",
-            "dsTool4": "[steps('cvuvSection').vmssDsTool4]",
-            "dsTool5": "[steps('cvuvSection').vmssDsTool5]",
-            "dsTool6": "[steps('cvuvSection').vmssDsTool6]",
-            "dsTool7": "[steps('cvuvSection').vmssDsTool7]",
-            "dsTool8": "[steps('cvuvSection').vmssDsTool8]",
-            "dsTool9": "[steps('cvuvSection').vmssDsTool9]",
-            "dsTool10": "[steps('cvuvSection').vmssDsTool10]",
+            "downstreamTools": "[steps('cvuvSection').vmssDsTools]",
             "TESTexistingVM": "[steps('cvuvSection').TESTexistingVM]",
             "TESTexistingNIC": "[steps('cvuvSection').TESTexistingNIC]",
             "cclearvName" : "[steps('cclearvSection').cclearvName]",
