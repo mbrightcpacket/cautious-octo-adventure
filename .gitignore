@@ -27,6 +27,7 @@ dist
 
 # Local python packages
 .python_packages/
+.mypy_cache/
 
 # Python Environments
 .env

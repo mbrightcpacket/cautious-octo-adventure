@@ -25,7 +25,7 @@ json:
 
 .PHONY: lint
 lint:
-	shellcheck *.sh
+	shellcheck *.sh ccloud-azure-images
 
 .PHONY: publish
 publish: format

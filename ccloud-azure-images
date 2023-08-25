@@ -55,14 +55,15 @@ root_command() {
         "$storage_account" \
         "${args['--expiry']}" \
         "$(azure_get_user)"
-    done 9< "$sas_urls_file"
+    done 9<"$sas_urls_file"
 
   else
 
     echo "No SAS URLs file '$sas_urls_file' is present, reading from STDIN ..."
 
+    # Read everything from STDIN and write it to the file because something in create_image is consuming STDIN.
     while read -r -u0 url; do
-      echo "$url" >> "$sas_urls_file"
+      echo "$url" >>"$sas_urls_file"
     done
 
     while read -r -u9 url; do
@@ -72,7 +73,7 @@ root_command() {
         "$storage_account" \
         "${args['--expiry']}" \
         "$(azure_get_user)"
-    done 9< "$sas_urls_file"
+    done 9<"$sas_urls_file"
 
     rm "$sas_urls_file"
 
@@ -89,21 +90,21 @@ version_command() {
   echo "$version"
 }
 
-ccloud_azure_create_image_usage() {
+ccloud_azure_images_usage() {
   if [[ -n $long_usage ]]; then
-    printf "ccloud-azure-create-image - Creates an Azure image from a Shared Access Signature URL\n"
+    printf "ccloud-azure-images - Creates Azure images from Shared Access Signature URLs\n"
     echo
 
   else
-    printf "ccloud-azure-create-image - Creates an Azure image from a Shared Access Signature URL\n"
+    printf "ccloud-azure-images - Creates Azure images from Shared Access Signature URLs\n"
     echo
 
   fi
 
   printf "%s\n" "Usage:"
-  printf "  ccloud-azure-create-image [OPTIONS]\n"
-  printf "  ccloud-azure-create-image --help | -h\n"
-  printf "  ccloud-azure-create-image --version | -v\n"
+  printf "  ccloud-azure-images [OPTIONS]\n"
+  printf "  ccloud-azure-images --help | -h\n"
+  printf "  ccloud-azure-images --version | -v\n"
   echo
 
   if [[ -n $long_usage ]]; then
@@ -124,8 +125,7 @@ ccloud_azure_create_image_usage() {
     echo
 
     printf "  %s\n" "--location, -l STRING"
-    printf "    Azure locations\n    To list available locations: az account list-locations\n    To configure the default location: az configure --defaults\n    location=<location>\n"
-    printf "    Default: eastus2\n"
+    printf "    Azure location\n    To list available locations:\n      az account list-locations\n    To configure the default location:\n      e.g. az configure --defaults location=eastus2\n"
     echo
 
     printf "  %s\n" "--expiry, -e EXPIRY DATE"
@@ -303,7 +303,7 @@ parse_requirements() {
 
       --help | -h)
         long_usage=yes
-        ccloud_azure_create_image_usage
+        ccloud_azure_images_usage
         exit
         ;;
 
@@ -416,7 +416,6 @@ parse_requirements() {
 
   [[ -n ${args['--file']:-} ]] || args['--file']="ccloud-urls.txt"
   [[ -n ${args['--resource-group']:-} ]] || args['--resource-group']="cpacket-ccloud"
-  [[ -n ${args['--location']:-} ]] || args['--location']="eastus2"
   [[ -n ${args['--expiry']:-} ]] || args['--expiry']="1 days"
 
 }

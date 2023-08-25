@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-resource_group="mbright-bicep-test"
+resource_group="angryhippo-bicep-test"
 app="registerangryhippo"
 
 storage_account_id="$(az storage account list -g "$resource_group" -o tsv --query '[0].id')"
