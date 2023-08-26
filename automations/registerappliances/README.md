@@ -1,7 +1,14 @@
-## Getting Started with Azure Function
-### Last updated: March 8th 2021
+# Register appliances with cClear-V
 
-#### Project Structure
+This Azure Function App registers appliances with cClear-V.
+It responds to Event Grid System Topic events by issuing HTTP requests to cClear-V and cVu-V.
+
+Below is the generated documentation from the Azure Function core tools.
+
+## Getting Started with Azure Function
+
+### Project Structure
+
 The main project folder (<project_root>) can contain the following files:
 
 * **local.settings.json** - Used to store app settings and connection strings when running locally. This file doesn't get published to Azure. To learn more, see [local.settings.file](https://aka.ms/azure-functions/python/local-settings).
@@ -15,15 +22,15 @@ The main project folder (<project_root>) can contain the following files:
 
 Each function has its own code file and binding configuration file ([**function.json**](https://aka.ms/azure-functions/python/function.json)).
 
-#### Developing your first Python function using VS Code
+### Developing your first Python function using VS Code
 
 If you have not already, please checkout our [quickstart](https://aka.ms/azure-functions/python/quickstart) to get you started with Azure Functions developments in Python. 
 
-#### Publishing your function app to Azure 
+### Publishing your function app to Azure 
 
 For more information on deployment options for Azure Functions, please visit this [guide](https://docs.microsoft.com/en-us/azure/azure-functions/create-first-function-vs-code-python#publish-the-project-to-azure).
 
-#### Next Steps
+### Next Steps
 
 * To learn more about developing Azure Functions, please visit [Azure Functions Developer Guide](https://aka.ms/azure-functions/python/developer-guide).
 

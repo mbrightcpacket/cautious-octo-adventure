@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+# Set the following variables as appropriate
 resource_group="angryhippo-bicep-test"
 app="registerangryhippo"
+
+# The script begins below this line
 
 storage_account_id="$(az storage account list -g "$resource_group" -o tsv --query '[0].id')"
 echo "storage account ID: $storage_account_id"
