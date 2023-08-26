@@ -1,8 +1,4 @@
-# cautious-octo-adventure
-
-> Caution: This is unofficial, pre-release software, and should NOT be used in production.
-
-## Copy the appliances into your Azure subscription
+# Copy the appliances into your Azure subscription
 
 Before deploying the cPacket cCloud appliances, they must be copied into your Azure subscription.
 
@@ -11,38 +7,37 @@ Before deploying the cPacket cCloud appliances, they must be copied into your Az
 1. Upload it to the Azure cloud shell.
 1. Download and execute the `ccloud-azure-create-image` script.
 
-### Obtain the appliance URLs file
+## Obtain the appliance URLs file
 
 Contact cPacket Networks to obtain the appliance URLs file.
+This file contains the Shared Access Signature (SAS) URLs of the appliances.
 
 ### Open the Azure cloud shell
 
-Open the Azure cloud shell by clicking on the icon in the upper right corner of the Azure portal.
+In the Azure portal, open the Azure cloud shell by clicking on the icon in the upper right corner of the Azure portal.
 
-![Open the shell](open-shell.png "Open the Azure cloud shell")
+![Open the shell](/static-assets/open-shell.png "Open the Azure cloud shell")
 
 ### Upload the file containing the appliance URLs
 
-cPacket will provide you with a file containing the URLs of the appliances.
-It contains the URLs with Shared Access Signatures (SAS) for the appliances.
-Upload this file to Azure cloud shell.
+Upload this `ccloud-urls.txt` file to the Azure cloud shell.
 (The root directory of the cloud shell is expected, and it is the default upload location.)
 
-![Upload file](upload-file-to-shell.png "Upload the 'ccloud-urls.txt' file to shell")
+![Upload file](/static-assets/upload-file-to-shell.png "Upload the 'ccloud-urls.txt' file to shell")
 
 ### Create the images
 
-The `ccloud-azure-create-image` script will create the images in your Azure subscription by first copying them using the SAS enabled URLs provided above.
+The `ccloud-azure-images` script will create the images in your Azure subscription using the URLs provided in `ccloud-urls.txt`.
 
-If you are creating a new resource group, use the following invocation:
+If you are creating a new resource group with a default name, you can pipe the script directly through the shell as the following invocation:
 
 ```bash
 curl -L https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/ccloud-azure-create-image | bash
 ```
 
-This will pipe the script directly into Bash and will create a new resource group called `cpacket-ccloud` in the `eastus2` region.
+This creates a new resource group with a name such as `cpacket-ccloud-abc123` in the `eastus2` region.
 
-Instead, if you have an existing resource group, first download the script and then supply it with the name of your resource group.
+Instead, if you have an existing resource group or would like to create the resource group with a specific name, first download the script and then supply it with the name of your resource group.
 
 Download the script:
 
@@ -64,7 +59,7 @@ Run it:
 
 After executing the script, you should have new resources in your resource group corresponding to the cCloud appliances in the URL file above:
 
-![New resources](new-resources.png "cCloud images")
+![New resources](/static-assets/new-resources.png "cCloud images")
 
 ## Deploy to Azure
 
