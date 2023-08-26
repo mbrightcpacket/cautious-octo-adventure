@@ -1,42 +1,6 @@
 # Deploy to Azure
 
 After creating the appliance images, you can deploy them.
+Click on the button below to launch the Bicep templates into the Azure portal.
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Fmain%2Fmain.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Fmain%2FcreateUIDefinition.json)
-
-## Extra resources
-
-Not everything can be deployed via the Bicep templates, so there are some extra resources that need to be created manually.
-
-### Azure Function App
-
-## Contributing
-
-### Generating the Azure button
-
-To create the [Azure button][azure-button], you need to run the `azure-button.py` script, which takes two arguments:
-
-```bash
-./azure-button.py -a https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/test1/main.json -u https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/test1/createUIDefinition.json
-```
-
-... produces:
-
-```bash
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Fmain%2Fmain.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Fmain%2FcreateUIDefinition.json)
-```
-
-... which is then pasted into the `README.md` file and rendered as:
-
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Fmain%2Fmain.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2Fmbrightcpacket%2Fcautious-octo-adventure%2Fmain%2FcreateUIDefinition.json)
-
-Clicking the button above will take you to the Azure portal and start the custom deployment process with the version tagged `test1`, as illustrated below:
-
-![custom deployment](deployment.png "Custom Deployment")
-
-### Editing the browser UI
-
-There is also a [browser based interface][ui-definition] to edit the UI definition that defines the above flow.
-
-[azure-button]: https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-to-azure-button
-[ui-definition]: https://portal.azure.com/?feature.customPortal=false#view/Microsoft_Azure_CreateUIDef/SandboxBlade]
