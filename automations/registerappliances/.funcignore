@@ -1,2 +1,5 @@
+.dockerignore
+.gitignore
+Dockerfile
+getting-started.md
 local.settings.json
-getting_started.md
