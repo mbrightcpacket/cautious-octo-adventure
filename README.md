@@ -10,7 +10,7 @@ The content is meant to supplement officially released cPacket documentation and
 
 - [Prerequisites](docs/prerequisites.md)
 - [Copy the appliances into your Azure subscription](docs/get-images.md)
-- [Deploy the appliances into Azure](docs/deploy-appliances.md)
+- [Deploy the appliances into Azure](/automations/capture-net/README.md)
 - [Post-installation steps](docs/post-installation.md)
 
 ## Contributing and reporting bugs
