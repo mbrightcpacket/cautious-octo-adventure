@@ -1,6 +1,6 @@
 # cCloud deployment
 
-> Caution ⚠️: This is unofficial, pre-release software, and should NOT be used in production.
+> Caution ⚠️: This is currently unofficial, pre-release software, and should NOT be used in production. The Git repository is for the purpose of testing and development only, and its history will be re-written.
 
 This repository contains documentation and scripts to facilitate cCloud deployment.
 
