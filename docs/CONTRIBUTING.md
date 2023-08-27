@@ -31,7 +31,7 @@ The file and directory layout is arbitrarily subject to change, so use [permalin
 - Formatting of Bash scripts should comply with the following use of [shfmt][shfmt]:
 
     ```bash
-    shfmt -i 4 -w script.sh
+    shfmt --diff --case-indent --indent 2 -w script.sh
     ```
 
 ## Terraform
