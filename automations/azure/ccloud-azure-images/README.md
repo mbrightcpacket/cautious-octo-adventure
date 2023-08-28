@@ -37,7 +37,7 @@ The `ccloud-azure-images` script will create the images in your Azure subscripti
 If you are creating a new resource group with a default name, you can pipe the script directly through the shell as the following invocation:
 
 ```bash
-curl -s -L https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/automations/ccloud-azure-images/ccloud-azure-images | bash
+curl -s -L https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/automations/azure/ccloud-azure-images/ccloud-azure-images | bash
 ```
 
 This creates a new resource group with a name such as `cpacket-ccloud-abc123` in the `eastus2` region.
@@ -47,7 +47,7 @@ Instead, if you have an existing resource group or would like to create the reso
 Execute the script with the `-g` flag:
 
 ```bash
-curl -L https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/automations/ccloud-azure-images/ccloud-azure-images | bash -s -- -g resource-group-name
+curl -L https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/automations/azure/ccloud-azure-images/ccloud-azure-images | bash -s -- -g resource-group-name
 ```
 
 After executing the script, you should have new resources in your resource group corresponding to the cCloud appliances in the URL file above:
@@ -59,7 +59,7 @@ To find out about the script's options,
 Download the script:
 
 ```bash
-curl -s -L -O https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/automations/ccloud-azure-images/ccloud-azure-images
+curl -s -L -O https://raw.githubusercontent.com/mbrightcpacket/cautious-octo-adventure/main/automations/azure/ccloud-azure-images/ccloud-azure-images
 ```
 
 Make it executable:

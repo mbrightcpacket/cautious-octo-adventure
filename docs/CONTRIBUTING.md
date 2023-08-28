@@ -44,7 +44,7 @@ terraform fmt
 
 ## Generate the Azure deployment buttons
 
-See [azure-button](../automations/azure-button/README.md).
+See [azure-button](../automations/azure/azure-button/README.md).
 
 [shellcheck]: https://github.com/koalaman/shellcheck
 [permalinks]: https://docs.github.com/en/repositories/working-with-files/using-files/getting-permanent-links-to-files

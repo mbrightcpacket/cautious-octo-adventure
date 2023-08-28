@@ -9,8 +9,8 @@ The content is meant to supplement officially released cPacket documentation and
 ## Getting started with Microsoft Azure
 
 - [Prerequisites](docs/prerequisites.md)
-- [Copy the appliances into your Azure subscription](/automations/ccloud-azure-images/README.md)
-- [Deploy the appliances into Azure](/automations/capture-net/README.md)
+- [Copy the appliances into your Azure subscription](/automations/azure/ccloud-azure-images/README.md)
+- [Deploy the appliances into Azure](/automations/azure/capture-net/README.md)
 - [Post-installation steps](docs/post-installation.md)
 
 ## Contributing and reporting bugs
